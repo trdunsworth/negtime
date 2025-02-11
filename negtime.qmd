@@ -1,0 +1,72 @@
+---
+title: "negtime"
+date: "2025-02-05"
+format:
+  docx:
+    toc: true
+    toc-title: "Contents"
+    number-sections: true
+    highlight-style: arrow
+    
+execute:
+    echo: false
+engine: knitr
+---
+
+```{r libraries}
+#| echo: false
+#| output: false
+library(tidyverse)
+library(tidymodels)
+library(ggpubr)
+library(rstatix)
+library(car)
+library(broom)
+library(janitor)
+library(Hmisc)
+library(psych)
+library(GGally)
+library(FSA)
+library(multcomp)
+library(emmeans)
+library(sur)
+library(DescTools)
+library(visdat)
+library(nlme)
+library(funModeling)
+library(inspectdf)
+library(dlookr)
+library(merTools)
+library(factoextra)
+library(lubridate)
+library(modeest)
+library(raster)
+library(moments)
+library(ggthemes)
+library(nortest)
+library(MASS)
+library(randtests)
+library(summarytools)
+library(report)
+library(correlation)
+library(knitr)
+library(rmarkdown)
+library(modelbased)
+library(parameters)
+library(performance)
+library(insight)
+library(fBasics)
+library(knitr)
+library(kableExtra)
+library(viridis)
+library(ggridges)
+library(gt)
+```
+
+# CAD Time Stamp Analysis
+
+The following analysis is desinged to look at the time stamps related to service calls for the past 13 months and determine the significance of event sequencing and investigate the challenges presented when calls for service are manipulated after the first call closure.
+
+## Author's Note
+
+The data was harvested from the CentralSquare Enterprise CAD Reporting Database. The two
