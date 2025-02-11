@@ -2,7 +2,7 @@
 title: "negtime"
 date: "2025-02-05"
 format:
-  docx:
+  html:
     toc: true
     toc-title: "Contents"
     number-sections: true
@@ -67,6 +67,87 @@ library(gt)
 
 The following analysis is desinged to look at the time stamps related to service calls for the past 13 months and determine the significance of event sequencing and investigate the challenges presented when calls for service are manipulated after the first call closure.
 
+```{r load_dataset}
+#| echo: false
+#| output: false
+
+df <- read_csv("C:\\Users\\tony.dunsworth\\projects\\negtime\\data\\ItsAboutTime.csv")
+```
+
 ## Author's Note
 
-The data was harvested from the CentralSquare Enterprise CAD Reporting Database. The two
+The data was harvested from the CentralSquare Enterprise CAD Reporting Database. The two database tables that were queried are Response_Master_Incident and Response_Master_Incident_Ext. These two tables contain all of the time stamps needed for the analysis. For this analysis, the data consists of call information, including the method of call reception, priority number, and the problem type from 01 January 2024 through 31 January 2025. This dataset consists of `{r} nrow(df)` rows prior to any cleaning of adjustments.
+
+The next step is to take the time stamps that are identified in the background as characters (chr) and convert them to timestamps. We will do this using a variation of the `as.POSIXct()` function. After that, the elapsed times are also listed as chr and we need them to be integers. This happens because there are NULL values and when saving the output of the SQL query to a comma-separated values (CSV) file, NULL becomes imprinted as a string. 
+
+```{r convert_timestamps}
+#| echo: false
+#| output: false
+
+df$ClockStartTime <- as.POSIXct(sub("\\.000$", "", df$ClockStartTime), format = "%Y-%m-%d %H:%M:%S", tz = "EST")
+df$Time_PhonePickUp <- as.POSIXct(sub("\\.000$", "", df$Time_PhonePickUp), format = "%Y-%m-%d %H:%M:%S", tz = "EST")
+df$Fixed_Time_PhonePickUp <- as.POSIXct(sub("\\.000$", "", df$Fixed_Time_PhonePickUp), format = "%Y-%m-%d %H:%M:%S", tz = "EST")
+df$Time_FirstCallTakingKeystroke <- as.POSIXct(sub("\\.000$", "", df$Time_FirstCallTakingKeystroke), format = "%Y-%m-%d %H:%M:%S", tz = "EST")
+df$TimeCallViewed <- as.POSIXct(sub("\\.000$", "", df$TimeCallViewed), format = "%Y-%m-%d %H:%M:%S", tz = "EST")
+df$Time_CallTakingComplete <- as.POSIXct(sub("\\.000$", "", df$Time_CallTakingComplete), format = "%Y-%m-%d %H:%M:%S", tz = "EST")
+df$Fixed_Time_CallTakingComplete <- as.POSIXct(sub("\\.000%", "", df$Fixed_Time_CallTakingComplete), format = "%Y-%m-%d %H:%M:%S", tz = "EST")
+df$Time_First_Unit_Assigned <- as.POSIXct(sub("\\.000$", "", df$Time_First_Unit_Assigned), format = "%Y-%m-%d $H:$M:$S", tz = "EST")
+df$TimeFirstUnitDispatchAcknowledged <- as.POSIXct(sub("\\.000$", "", df$TimeFirstUnitDispatchAcknowledged), format = "$Y-%m-%d %H:%M:%S", tz = "EST")
+df$Time_First_Unit_Enroute <- as.POSIXct(sub("\\.000$", "", df$Time_First_Unit_Enroute), format = "%Y-%m-%d %H:%M:%S", tz = "EST")
+df$Time_First_Unit_Arrived <- as.POSIXct(sub("\\.000$", "", df$Time_First_Unit_Arrived), format = "%Y-%m-%d %H:%M:%S", tz = "EST")
+df$TimeFirstCallCleared <- as.POSIXct(sub("\\.000$", "", df$TimeFirstCallCleared), format = "%Y-%m-%d %H:%M:%S", tz = "EST")
+```
+
+```{r convert_integers}
+#| echo: false
+#| output: false
+
+df$Priority_Number <- as.integer(df$Priority_Number)
+df$DELTA_RD_CST <- as.integer(df$DELTA_RD_CST)
+df$DELTA_RD_TPU <- as.integer(df$DELTA_RD_TPU)
+df$DELTA_RD_FTPU <- as.integer(df$DELTA_RD_FTPU)
+df$DELTA_RD_FCTK <- as.integer(df$DELTA_RD_FCTK)
+df$DELTA_CST_TPU <- as.integer(df$DELTA_CST_TPU)
+df$DELTA_CST_FTPU <- as.integer(df$DELTA_CST_FTPU)
+df$DELTA_CST_FCTK <- as.integer(df$DELTA_CST_FCTK)
+df$DELTA_TPU_FTPU <- as.integer(df$DELTA_TPU_FTPU)
+df$DELTA_TPU_FCTK <- as.integer(df$DELTA_TPU_FCTK)
+df$DELTA_FTPU_FCTK <- as.integer(df$DELTA_FTPU_FCTK)
+df$DELTA_QUEUES <- as.integer(df$DELTA_QUEUES)
+df$DELTA_CALLTAKING <- as.integer(df$DELTA_CALLTAKING)
+df$STEP_1 <- as.integer(df$STEP_1)
+df$STEP_2 <- as.integer(df$STEP_2)
+df$STEP_2A <- as.integer(df$STEP_2A)
+df$STEP_2B <- as.integer(df$STEP_2B)
+df$STEP_3 <- as.integer(df$STEP_3)
+df$CALL_TIME <- as.integer(df$CALL_TIME)
+df$STEP_4 <- as.integer(df$STEP_4)
+df$STEP_5 <- as.integer(df$STEP_5)
+df$STEP_6 <- as.integer(df$STEP_6)
+df$STEP_7 <- as.integer(df$STEP_7)
+df$STEP_8 <- as.integer(df$STEP_8)
+df$STEP_9 <- as.integer(df$STEP_9)
+df$STEP_10 <- as.integer(df$STEP_10)
+df$TOTAL_TIME_A <- as.integer(df$TOTAL_TIME_A)
+df$TOTAL_TIME_B <- as.integer(df$TOTAL_TIME_B)
+
+df <- subset(df, select = -c(TimeFirstStacked))
+```
+
+After the cleaning steps that take place behind the scenes, two of the original columns have been dropped because they contained no values. Below is a list of the remaining columns and the data they contain or the time frames they represent. 
+
+::: {.callout-note}
+Note that any negative values in the deltas occur when the time for the rightmost variable is earlier than the time recorded for the leftmost variable.
+:::
+
+::: {}
+1. ID: *This is the ID column from the CAD. We will use it to isolate specific calls for further analyses.*
+2. MethodOfCallReceived: *This is how the call entered DECC. __'Null'__ Values will be changed to 'Not Recorded' for analytical purposes.*
+3. Problem: *This is the final problem nature as updated by the parties working the call*
+4. Priority_Number: *This is the relative importance level assigned by DECC. This will be used for further analyses*
+5. Agency_Type: *This indicates if the call was for LAW, FIRE, or DEC.*
+6. Jurisdiction: *This indicates for whom the call was run.*
+7. Response_Date: *This, per CS, is the timestamp indicating when the ID was created and is frequently used, by them, as the __start__ of the call.*
+8. ClockStartTime: *This should be, per CS, the __actual__ starting point for the call.*
+9. Time_PhonePickUp: *This timestamp indentifies when the CAD acknowledged the start of the phone call for the event.*
+:::
