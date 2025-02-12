@@ -1,5 +1,5 @@
 ---
-title: "negtime"
+title: "CAD Time Stamp Analysis"
 date: "2025-02-05"
 format:
   html:
@@ -10,8 +10,13 @@ format:
     
 execute:
     echo: false
+    warn_large_data: false
 engine: knitr
 ---
+
+```{r setup}
+options(warn_large_data = FALSE)
+```
 
 ```{r libraries}
 #| echo: false
@@ -78,6 +83,8 @@ df <- read_csv("C:\\Users\\tony.dunsworth\\projects\\negtime\\data\\ItsAboutTime
 
 The data was harvested from the CentralSquare Enterprise CAD Reporting Database. The two database tables that were queried are Response_Master_Incident and Response_Master_Incident_Ext. These two tables contain all of the time stamps needed for the analysis. For this analysis, the data consists of call information, including the method of call reception, priority number, and the problem type from 01 January 2024 through 31 January 2025. This dataset consists of `{r} nrow(df)` rows prior to any cleaning of adjustments.
 
+## Dataset Creation and Cleaning
+
 The next step is to take the time stamps that are identified in the background as characters (chr) and convert them to timestamps. We will do this using a variation of the `as.POSIXct()` function. After that, the elapsed times are also listed as chr and we need them to be integers. This happens because there are NULL values and when saving the output of the SQL query to a comma-separated values (CSV) file, NULL becomes imprinted as a string. 
 
 ```{r convert_timestamps}
@@ -134,9 +141,11 @@ df$TOTAL_TIME_B <- as.integer(df$TOTAL_TIME_B)
 df <- subset(df, select = -c(TimeFirstStacked))
 ```
 
+### Dataset Description
+
 After the cleaning steps that take place behind the scenes, two of the original columns have been dropped because they contained no values. Below is a list of the remaining columns and the data they contain or the time frames they represent. 
 
-::: {.callout-note}
+::: {.callout-important}
 Note that any negative values in the deltas occur when the time for the rightmost variable is earlier than the time recorded for the leftmost variable.
 :::
 
@@ -150,4 +159,69 @@ Note that any negative values in the deltas occur when the time for the rightmos
 7. Response_Date: *This, per CS, is the timestamp indicating when the ID was created and is frequently used, by them, as the __start__ of the call.*
 8. ClockStartTime: *This should be, per CS, the __actual__ starting point for the call.*
 9. Time_PhonePickUp: *This timestamp indentifies when the CAD acknowledged the start of the phone call for the event.*
+10. Fixed_Time_PhonePickUp: *This timestamp also identifies when the CAD acknowledged the start of the phone call for the event, but is deemed __immutable__ by the software.*
+11. Time_FirstCallTakingKeystroke: *This timestamp identifies when the CAD software registers the first keystroke related to the event*
+12. DELTA_RD_CST: *This is the difference, hence Δ, between the Response_Date and ClockStartTime columns.* 
+13. DELTA_RD_TPU: *This is the difference between the Response_Date and the Time_PhonePickUp columns.*
+14. DELTA_RD_FTPU: *This is the difference between the Response_Date and the Fixed_Time_PhonePickUp columns.*
+15. DELTA_RD_FCTK: *This is the difference between the Response_Date and the Time_FirstCallTakingKeystroke columns.*
+16. DELTA_CST_TPU: *This is the difference between the ClockStartTime and the Time_PhonePickUp columns.*
+17. DELTA_CST_FTPU: *This is the difference between the ClockStartTime and the Fixed_Time_PhonePickUp columns.*
+18. DELTA CST_FCTK: *This is the difference between the ClockStartTime and the Time_FirstCallTakingKeystroke columns.*
+19. DELTA_TPU_FTPU: *This is the difference between the Time_PhonePickUp and Fixed_Time_PhonePickUp columns.*
+20. DELTA_TPU_FCTK: *This is the difference between the Time_PhonePickUp and Time_FirstCallTakingKeystroke columns.*
+21. DELTA_FTPU_FCTK: *This is the difference between the Fixed_Time_PhonePickUp and Time_FirstCallTakingKeystroke columns.*
+22. TimeCallViewed: *This is defined by the vendor as the time the call was first viewed in the Call Taking Form.*
+23. Time_CallEnteredQueue: *This is the time when the call has been released to be dispatched by the calltaker.*
+24. Fixed_Time_CallEnteredQueue: *This is the __fixed__ time when the call has been released to be dispatched by the calltaker.*
+25. DELTA_QUEUES: *This is the difference between the Time_CallEnteredQueue and Fixed_Time_CallEnteredQueue columns.*
+26. Time_CallTakingComplete: *This is the time when the caller is released.*
+27. Fixed_Time_CallTakingComplete: *This is the __fixed__ time when the caller is released.*
+28. DELTA_CALLTAKING: *This is the difference between the Time_CallTakingComplete and Fixed_Time_CallTakingComplete columns.*
+29. Time_First_Unit_Assigned: *This is the time when the dispatcher assigned the first unit to the call.*
+30. TimeFirstUnitDispatchAcknowledged: *This is the time when the first unit acknowledges receiving the dispatched call.*
+31. Time_First_Unit_Enroute: *This is the time the first dispatched unit marks or is marked 'En Route' for the assigned call.*
+32. Time_First_Unit_Arrived: *This is the time the first dispatched unit marks or is marked 'Arrived' for the assigned call.*
+33. TimeFirsCallCleared: *This is the time that the first unit clears or leaves the call after arrival.*
+34. Time_CallClosed: *This is the time that the final unit is cleared from the call, closing the event out.*
+35. Fixed_Time_CallClosed: *This is the __fixed__ time that the final unit is cleared from the call, closing the event out.* 
+36. STEP_1: *This is the time difference between the ClockStartTime and the Time_PhonePickUp columns.*
+37. STEP_2: *This is the time difference between the Time_PhonePickUp and the Time_FirstCallTakingKeystroke columns.*
+38. STEP_2A: *This is the time difference between the Time_PhonePickUp and TimeCallViewed columns.*
+39. STEP_2B: *This is the time difference between the TimeCallViewed and Time_FirstCallTakingKeystroke columns.*
+40. STEP_3: *This is the time difference between the Time_FirstCallTakingKeystroke and Time_CallEnteredQueue columns.*
+41. CALL_TIME: *This is the time difference between the Time_PhonePickUp and Time_CallTakingComplete columns.*
+42. STEP_4: *This is the time difference between the Time_CallEnteredQueue and Time_First_Unit_Assigned columns.*
+43. STEP_5: *This is the time difference between the Time_First_Unit_Assigned and TimeFirstUnitDispatchAcknowledged columns.*
+44. STEP_6: *This is the time difference between the TimeFirstUnitDispatchAcknowledged and Time_First_Unit_Enrote columns.*
+45. STEP_7: *This is the time difference between the Time_First_Unit_Enroute and Time_First_Unit_Arrived columns.*
+46. STEP_8: *This is the time difference between the Time_First_Unit_Arrived and TimeFirstCallCleared columns.*
+47. STEP_9: *This is the time difference between the TimeFirstCallCleared and Time_CallClosed columns.*
+48. STEP_10: *This is the time difference between the Time_First_Unit_Arrived and Time_CallClosed columns.*
+49. TOTAL_TIME_A: *This is the time difference between the Response_Date and Time_CallClosed columns.*
+50. TOTAL_TIME_B: *This is the time difference between the ClockStartTime and Time_CallClosed columns.*
 :::
+
+::: {.callout-note}
+Please note that there should not be, if calls are not re-opened, any delta between a time stamp and its 'Fixed' counterpart.
+:::
+
+In the list above, the Steps columns are meant to follow a call from the time the clock starts to the time the clock stops. I've identified a possible 10 step timing chain that wouild allow us to step through the history of a call. There are multiple possible steps for the second step depending on management preferences. Once we have established the chain time wise, then we can use these steps as a tool to investigate specific events and to get better analyses and insights from processes overall. This can also assist in trend analyses. Where there are no entries for some ofthese time points, we may need to create alternative elapsed time points to create our steps. Those decisions are part of this project's goals.
+
+You will note there are some columns duplicated because they are meant to be used for different analyses using the same dataset. Traditionally, we shouldn't have to do this, but I chose to make this distinction for ease of use.
+
+## Data Analysis
+
+### Missing Data
+
+Looking at the dataset, here is a graph of missing data:
+
+```{r missing_data, warn_large_data=FALSE}
+#| echo: false
+
+library(naniar)
+gg_miss_var(df)
+```
+
+As you can see from the graph above, the biggest issues that we see are with TimeFirstUnitDispatchAcknowledged and Time_First_Unit_Assigned with a large majority of the rows where they are absent. While the first showing an acknowledgement is not an issue. I can safely recommend that it be removed and we leave it out of future research work, I am very concerned about the Time_First_Unit_Assigned being so sparse. If we are called on by the City to discuss overall response time, not knowing when we started assigning units to a call presents a large-scale problem for DECC and the City. However, a brief visual inspection does not appear to support the graph's assertion that over 150,000 rows have a missing value. 
+

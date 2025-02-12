@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2025-02-05">
 
-<title>negtime</title>
+<title>CAD Time Stamp Analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -49,6 +49,14 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#cad-time-stamp-analysis" id="toc-cad-time-stamp-analysis" class="nav-link active" data-scroll-target="#cad-time-stamp-analysis"><span class="header-section-number">1</span> CAD Time Stamp Analysis</a>
   <ul class="collapse">
   <li><a href="#authors-note" id="toc-authors-note" class="nav-link" data-scroll-target="#authors-note"><span class="header-section-number">1.1</span> Author’s Note</a></li>
+  <li><a href="#dataset-creation-and-cleaning" id="toc-dataset-creation-and-cleaning" class="nav-link" data-scroll-target="#dataset-creation-and-cleaning"><span class="header-section-number">1.2</span> Dataset Creation and Cleaning</a>
+  <ul class="collapse">
+  <li><a href="#dataset-description" id="toc-dataset-description" class="nav-link" data-scroll-target="#dataset-description"><span class="header-section-number">1.2.1</span> Dataset Description</a></li>
+  </ul></li>
+  <li><a href="#data-analysis" id="toc-data-analysis" class="nav-link" data-scroll-target="#data-analysis"><span class="header-section-number">1.3</span> Data Analysis</a>
+  <ul class="collapse">
+  <li><a href="#missing-data" id="toc-missing-data" class="nav-link" data-scroll-target="#missing-data"><span class="header-section-number">1.3.1</span> Missing Data</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -57,7 +65,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">negtime</h1>
+<h1 class="title">CAD Time Stamp Analysis</h1>
 </div>
 
 
@@ -86,8 +94,80 @@ ul.task-list li input[type="checkbox"] {
 <section id="authors-note" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="authors-note"><span class="header-section-number">1.1</span> Author’s Note</h2>
 <p>The data was harvested from the CentralSquare Enterprise CAD Reporting Database. The two database tables that were queried are Response_Master_Incident and Response_Master_Incident_Ext. These two tables contain all of the time stamps needed for the analysis. For this analysis, the data consists of call information, including the method of call reception, priority number, and the problem type from 01 January 2024 through 31 January 2025. This dataset consists of 178780 rows prior to any cleaning of adjustments.</p>
+</section>
+<section id="dataset-creation-and-cleaning" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="dataset-creation-and-cleaning"><span class="header-section-number">1.2</span> Dataset Creation and Cleaning</h2>
 <p>The next step is to take the time stamps that are identified in the background as characters (chr) and convert them to timestamps. We will do this using a variation of the <code>as.POSIXct()</code> function. After that, the elapsed times are also listed as chr and we need them to be integers. This happens because there are NULL values and when saving the output of the SQL query to a comma-separated values (CSV) file, NULL becomes imprinted as a string.</p>
+<section id="dataset-description" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="dataset-description"><span class="header-section-number">1.2.1</span> Dataset Description</h3>
 <p>After the cleaning steps that take place behind the scenes, two of the original columns have been dropped because they contained no values. Below is a list of the remaining columns and the data they contain or the time frames they represent.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note that any negative values in the deltas occur when the time for the rightmost variable is earlier than the time recorded for the leftmost variable.</p>
+</div>
+</div>
+<div>
+<ol type="1">
+<li>ID: <em>This is the ID column from the CAD. We will use it to isolate specific calls for further analyses.</em></li>
+<li>MethodOfCallReceived: <em>This is how the call entered DECC. <strong>‘Null’</strong> Values will be changed to ‘Not Recorded’ for analytical purposes.</em></li>
+<li>Problem: <em>This is the final problem nature as updated by the parties working the call</em></li>
+<li>Priority_Number: <em>This is the relative importance level assigned by DECC. This will be used for further analyses</em></li>
+<li>Agency_Type: <em>This indicates if the call was for LAW, FIRE, or DEC.</em></li>
+<li>Jurisdiction: <em>This indicates for whom the call was run.</em></li>
+<li>Response_Date: <em>This, per CS, is the timestamp indicating when the ID was created and is frequently used, by them, as the <strong>start</strong> of the call.</em></li>
+<li>ClockStartTime: <em>This should be, per CS, the <strong>actual</strong> starting point for the call.</em></li>
+<li>Time_PhonePickUp: <em>This timestamp indentifies when the CAD acknowledged the start of the phone call for the event.</em></li>
+<li>Fixed_Time_PhonePickUp: <em>This timestamp also identifies when the CAD acknowledged the start of the phone call for the event, but is deemed <strong>immutable</strong> by the software.</em></li>
+<li>Time_FirstCallTakingKeystroke: <em>This timestamp identifies when the CAD software registers the first keystroke related to the event</em></li>
+<li>DELTA_RD_CST: <em>This is the difference, hence Δ, between the Response_Date and ClockStartTime columns.</em></li>
+<li>DELTA_RD_TPU: <em>This is the difference between the Response_Date and the Time_PhonePickUp columns.</em></li>
+<li>DELTA_RD_FTPU: <em>This is the difference between the Response_Date and the Fixed_Time_PhonePickUp columns.</em></li>
+<li>DELTA_RD_FCTK: <em>This is the difference between the Response_Date and the Time_FirstCallTakingKeystroke columns.</em></li>
+<li>DELTA_CST_TPU: <em>This is the difference between the ClockStartTime and the Time_PhonePickUp columns.</em></li>
+<li>DELTA_CST_FTPU: <em>This is the difference between the ClockStartTime and the Fixed_Time_PhonePickUp columns.</em></li>
+<li>DELTA CST_FCTK: <em>This is the difference between the ClockStartTime and the Time_FirstCallTakingKeystroke columns.</em></li>
+<li>DELTA_TPU_FTPU: <em>This is the difference between the Time_PhonePickUp and Fixed_Time_PhonePickUp columns.</em></li>
+<li>DELTA_TPU_FCTK: <em>This is the difference between the Time_PhonePickUp and Time_FirstCallTakingKeystroke columns.</em></li>
+<li>DELTA_FTPU_FCTK: <em>This is the difference between the Fixed_Time_PhonePickUp and Time_FirstCallTakingKeystroke columns.</em></li>
+<li>TimeCallViewed: <em>This is defined by the vendor as the time the call was first viewed in the Call Taking Form.</em></li>
+<li>Time_CallEnteredQueue: <em>This is the time when the call has been released to be dispatched by the calltaker.</em></li>
+<li>Fixed_Time_CallEnteredQueue: <em>This is the <strong>fixed</strong> time when the call has been released to be dispatched by the calltaker.</em></li>
+<li>DELTA_QUEUES: <em>This is the difference between the Time_CallEnteredQueue and Fixed_Time_CallEnteredQueue columns.</em></li>
+<li>Time_CallTakingComplete: <em>This is the time when the caller is released.</em></li>
+<li>Fixed_Time_CallTakingComplete: <em>This is the <strong>fixed</strong> time when the caller is released.</em></li>
+<li>DELTA_CALLTAKING: <em>This is the difference between the Time_CallTakingComplete and Fixed_Time_CallTakingComplete columns.</em></li>
+<li>Time_First_Unit_Assigned: <em>This is the time when the dispatcher assigned the first unit to the call.</em></li>
+<li>TimeFirstUnitDispatchAcknowledged: <em>This is the time when the first unit acknowledges receiving the dispatched call.</em></li>
+<li>Time_First_Unit_Enroute: <em>This is the time the first dispatched unit marks or is marked ‘En Route’ for the assigned call.</em></li>
+<li>Time_First_Unit_Arrived: <em>This is the time the first dispatched unit marks or is marked ‘Arrived’ for the assigned call.</em></li>
+<li>TimeFirsCallCleared: <em>This is the time that the first unit clears or leaves the call after arrival.</em></li>
+<li>Time_CallClosed: <em>This is the time that the final unit is cleared from the call, closing the event out.</em></li>
+<li>Fixed_Time_CallClosed: <em>This is the <strong>fixed</strong> time that the final unit is cleared from the call, closing the event out.</em></li>
+<li>STEP_1: <em>This is the time difference between the ClockStartTime and the Time_PhonePickUp columns.</em></li>
+<li>STEP_2: <em>This is the time difference between the Time_PhonePickUp and the Time_FirstCallTakingKeystroke columns.</em></li>
+<li>STEP_2A: <em>This is the time difference between the Time_PhonePickUp and TimeCallViewed columns.</em></li>
+<li>STEP_2B: <em>This is the time difference between the TimeCallViewed and Time_FirstCallTakingKeystroke columns.</em></li>
+<li>STEP_3: <em>This is the time difference between the Time_FirstCallTakingKeystroke and Time_CallEnteredQueue columns.</em></li>
+<li>CALL_TIME: <em>This is the time difference between the Time_PhonePickUp and Time_CallTakingComplete columns.</em></li>
+<li>STEP_4: <em>This is the time difference between the Time_CallEnteredQueue and Time_First_Unit_Assigned columns.</em></li>
+<li>STEP_5: <em>This is the time difference between the Time_First_Unit_Assigned and TimeFirstUnitDispatchAcknowledged columns.</em></li>
+<li>STEP_6: <em>This is the time difference between the TimeFirstUnitDispatchAcknowledged and Time_First_Unit_Enrote columns.</em></li>
+<li>STEP_7: <em>This is the time difference between the Time_First_Unit_Enroute and Time_First_Unit_Arrived columns.</em></li>
+<li>STEP_8: <em>This is the time difference between the Time_First_Unit_Arrived and TimeFirstCallCleared columns.</em></li>
+<li>STEP_9: <em>This is the time difference between the TimeFirstCallCleared and Time_CallClosed columns.</em></li>
+<li>STEP_10: <em>This is the time difference between the Time_First_Unit_Arrived and Time_CallClosed columns.</em></li>
+<li>TOTAL_TIME_A: <em>This is the time difference between the Response_Date and Time_CallClosed columns.</em></li>
+<li>TOTAL_TIME_B: <em>This is the time difference between the ClockStartTime and Time_CallClosed columns.</em></li>
+</ol>
+</div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -98,16 +178,29 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Note that any negative values in the deltas occur when the time for the rightmost variable is earlier than the time recorded for the leftmost variable.</p>
+<p>Please note that there should not be, if calls are not re-opened, any delta between a time stamp and its ‘Fixed’ counterpart.</p>
 </div>
 </div>
+<p>In the list above, the Steps columns are meant to follow a call from the time the clock starts to the time the clock stops. I’ve identified a possible 10 step timing chain that wouild allow us to step through the history of a call. There are multiple possible steps for the second step depending on management preferences. Once we have established the chain time wise, then we can use these steps as a tool to investigate specific events and to get better analyses and insights from processes overall. This can also assist in trend analyses. Where there are no entries for some ofthese time points, we may need to create alternative elapsed time points to create our steps. Those decisions are part of this project’s goals.</p>
+<p>You will note there are some columns duplicated because they are meant to be used for different analyses using the same dataset. Traditionally, we shouldn’t have to do this, but I chose to make this distinction for ease of use.</p>
+</section>
+</section>
+<section id="data-analysis" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="data-analysis"><span class="header-section-number">1.3</span> Data Analysis</h2>
+<section id="missing-data" class="level3" data-number="1.3.1">
+<h3 data-number="1.3.1" class="anchored" data-anchor-id="missing-data"><span class="header-section-number">1.3.1</span> Missing Data</h3>
+<p>Looking at the dataset, here is a graph of missing data:</p>
+<div class="cell" data-warn_large_data="false">
+<div class="cell-output-display">
 <div>
-<ol type="1">
-<li>ID <em>This is the ID column from the CAD. We will use it to isolate specific calls for further analyses.</em></li>
-<li>MethodOfCallReceived <em>This is how the call entered DECC. <strong>Null Values</strong> will be changed to ‘Not Recorded’ for analyticsl purposes.</em></li>
-<li>Problem <em>This is the final problem nature as updated by the parties working the call</em></li>
-</ol>
+<figure class="figure">
+<p><img src="negtime_files/figure-html/missing_data-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
+</div>
+</div>
+<p>As you can see from the graph above, the biggest issues that we see are with TimeFirstUnitDispatchAcknowledged and Time_First_Unit_Assigned with a large majority of the rows where they are absent. While the first showing an acknowledgement is not an issue. I can safely recommend that it be removed and we leave it out of future research work, I am very concerned about the Time_First_Unit_Assigned being so sparse. If we are called on by the City to discuss overall response time, not knowing when we started assigning units to a call presents a large-scale problem for DECC and the City. However, a brief visual inspection does not appear to support the graph’s assertion that over 150,000 rows have a missing value.</p>
+</section>
 </section>
 </section>
 
