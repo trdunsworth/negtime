@@ -1,0 +1,229 @@
+---
+title: "CAD Time Stamp Analysis"
+date: "2025-02-05"
+format:
+  html:
+    toc: true
+    toc-title: "Contents"
+    number-sections: true
+    highlight-style: arrow
+    
+execute:
+    echo: false
+    warn_large_data: false
+engine: knitr
+---
+
+```{r setup}
+options(warn_large_data = FALSE)
+```
+
+```{r libraries}
+#| echo: false
+#| output: false
+library(tidyverse)
+library(tidymodels)
+library(ggpubr)
+library(rstatix)
+library(car)
+library(broom)
+library(janitor)
+library(Hmisc)
+library(psych)
+library(GGally)
+library(FSA)
+library(multcomp)
+library(emmeans)
+library(sur)
+library(DescTools)
+library(visdat)
+library(nlme)
+library(funModeling)
+library(inspectdf)
+library(dlookr)
+library(merTools)
+library(factoextra)
+library(lubridate)
+library(modeest)
+library(raster)
+library(moments)
+library(ggthemes)
+library(nortest)
+library(MASS)
+library(randtests)
+library(summarytools)
+library(report)
+library(correlation)
+library(knitr)
+library(rmarkdown)
+library(modelbased)
+library(parameters)
+library(performance)
+library(insight)
+library(fBasics)
+library(knitr)
+library(kableExtra)
+library(viridis)
+library(ggridges)
+library(gt)
+```
+
+# CAD Time Stamp Analysis
+
+The following analysis is desinged to look at the time stamps related to service calls for the past 13 months and determine the significance of event sequencing and investigate the challenges presented when calls for service are manipulated after the first call closure.
+
+```{r load_dataset}
+#| echo: false
+#| output: false
+
+df <- readxl::read_excel('data\\ItsAboutTime.xlsx')
+```
+
+## Author's Note
+
+The data was harvested from the CentralSquare Enterprise CAD Reporting Database. The two database tables that were queried are Response_Master_Incident and Response_Master_Incident_Ext. These two tables contain all of the time stamps needed for the analysis. For this analysis, the data consists of call information, including the method of call reception, priority number, and the problem type from 01 January 2024 through 31 January 2025. This dataset consists of `{r} nrow(df)` rows prior to any cleaning of adjustments.
+
+## Data Cleaning and Preparation
+
+To ensure the data will be useful to us, the first step is cleaning. In this instance, after extracting the data from the archive database, cleaning was done in the Excel file, including removing the "NULL" values and replacing them with empty cells. This forces R to insert its own NULL value and allows it to correctly assign the data types to the columns. Here is a view of that so you can see what we have. 
+
+```{r data_types}
+#| echo: false
+
+str(df)
+```
+
+This leaves us well positioned because we now have the character (chr) columns, numeric (num) columns, and time stamps (POSIXct) defined. The numeric columns will be expressed as BIGINT in the background which is what we want for now. 
+
+### Column Definitions
+
+The columns for this dataset are defined as follows:
+
+::: {.callout-important}
+Note that any negative values in the deltas occur when the time for the rightmost variable is earlier than the time recorded for the leftmost variable.
+:::
+
+::: {}
+1. ID: *This is the ID column from the CAD. We will use it to isolate specific calls for further analyses.*
+2. Reception: *This is how the call entered DECC. __'Null'__ Values will be changed to 'Not Recorded' for analytical purposes.*
+3. Problem: *This is the final problem nature as updated by the parties working the call*
+4. Priority: *This is the relative importance level assigned by DECC. This will be used for further analyses*
+5. Agency: *This indicates if the call was for LAW, FIRE, or DEC.*
+6. Jurisdiction: *This indicates for whom the call was run.*
+7. Response_Date: *This, per CS, is the timestamp indicating when the ID was created and is frequently used, by them, as the __start__ of the call.*
+8. Clock_Start: *This should be, per CS, the __actual__ starting point for the call.*
+9. Phone_Start: *This timestamp identifies when the CAD acknowledged the start of the phone call for the event.*
+10. Fixed_Phone_Start: *This timestamp also identifies when the CAD acknowledged the start of the phone call for the event, but is deemed __immutable__ by the software.*
+11. First_Keystroke: *This timestamp identifies when the CAD software registers the first keystroke related to the event*
+12. DELTA_RD_CST: *This is the difference, hence Δ, between the Response_Date and ClockStartTime columns.* 
+13. DELTA_RD_TPU: *This is the difference between the Response_Date and the Time_PhonePickUp columns.*
+14. DELTA_RD_FTPU: *This is the difference between the Response_Date and the Fixed_Time_PhonePickUp columns.*
+15. DELTA_RD_FCTK: *This is the difference between the Response_Date and the Time_FirstCallTakingKeystroke columns.*
+16. DELTA_CST_TPU: *This is the difference between the ClockStartTime and the Time_PhonePickUp columns.*
+17. DELTA_CST_FTPU: *This is the difference between the ClockStartTime and the Fixed_Time_PhonePickUp columns.*
+18. DELTA CST_FCTK: *This is the difference between the ClockStartTime and the Time_FirstCallTakingKeystroke columns.*
+19. DELTA_TPU_FTPU: *This is the difference between the Time_PhonePickUp and Fixed_Time_PhonePickUp columns.*
+20. DELTA_TPU_FCTK: *This is the difference between the Time_PhonePickUp and Time_FirstCallTakingKeystroke columns.*
+21. DELTA_FTPU_FCTK: *This is the difference between the Fixed_Time_PhonePickUp and Time_FirstCallTakingKeystroke columns.*
+22. Viewed: *This is defined by the vendor as the time the call was first viewed in the Call Taking Form.*
+23. Queued: *This is the time when the call has been released to be dispatched by the calltaker.*
+24. Fixed_Queued: *This is the __fixed__ time when the call has been released to be dispatched by the calltaker.*
+25. DELTA_QUEUES: *This is the difference between the Time_CallEnteredQueue and Fixed_Time_CallEnteredQueue columns.*
+26. Phone_End: *This is the time when the caller is released.*
+27. Fixed_Phone_End: *This is the __fixed__ time when the caller is released.*
+28. DELTA_CALLTAKING: *This is the difference between the Time_CallTakingComplete and Fixed_Time_CallTakingComplete columns.*
+29. First_Dispatched: *This is the time when the dispatcher assigned the first unit to the call.*
+30. First_Ack: *This is the time when the first unit acknowledges receiving the dispatched call.*
+31. First_Enroute: *This is the time the first dispatched unit marks or is marked 'En Route' for the assigned call.*
+32. First_Arrived: *This is the time the first dispatched unit marks or is marked 'Arrived' for the assigned call.*
+33. First_Clear: *This is the time that the first unit clears or leaves the call after arrival.*
+34. Call_Closed: *This is the time that the final unit is cleared from the call, closing the event out.*
+35. Fixed_Call_Closed: *This is the __fixed__ time that the final unit is cleared from the call, closing the event out.* 
+36. STEP_1: *This is the time difference between the ClockStartTime and the Time_PhonePickUp columns.*
+37. STEP_2: *This is the time difference between the Time_PhonePickUp and the Time_FirstCallTakingKeystroke columns.*
+38. STEP_2A: *This is the time difference between the Time_PhonePickUp and TimeCallViewed columns.*
+39. STEP_2B: *This is the time difference between the TimeCallViewed and Time_FirstCallTakingKeystroke columns.*
+40. STEP_3: *This is the time difference between the Time_FirstCallTakingKeystroke and Time_CallEnteredQueue columns.*
+41. CALL_TIME: *This is the time difference between the Time_PhonePickUp and Time_CallTakingComplete columns.*
+42. STEP_4: *This is the time difference between the Time_CallEnteredQueue and Time_First_Unit_Assigned columns.*
+43. STEP_5: *This is the time difference between the Time_First_Unit_Assigned and TimeFirstUnitDispatchAcknowledged columns.*
+44. STEP_6: *This is the time difference between the TimeFirstUnitDispatchAcknowledged and Time_First_Unit_Enroute columns.*
+45. STEP_7: *This is the time difference between the Time_First_Unit_Enroute and Time_First_Unit_Arrived columns.*
+46. STEP_8: *This is the time difference between the Time_First_Unit_Arrived and TimeFirstCallCleared columns.*
+47. STEP_9: *This is the time difference between the TimeFirstCallCleared and Time_CallClosed columns.*
+48. STEP_10: *This is the time difference between the Time_First_Unit_Arrived and Time_CallClosed columns.*
+49. TOTAL_TIME_A: *This is the time difference between the Response_Date and Time_CallClosed columns.*
+50. TOTAL_TIME_B: *This is the time difference between the ClockStartTime and Time_CallClosed columns.*
+:::
+
+::: {.callout-note}
+Please note that there should not be, if calls are not re-opened, any delta between a time stamp and its 'Fixed' counterpart.
+:::
+
+In the list above, the Steps columns are meant to follow a call from the time the clock starts to the time the clock stops. I've identified a possible 10 step timing chain that would allow us to step through the history of a call. There are multiple possible steps for the second step depending on management preferences. Once we have established the chain time wise, then we can use these steps as a tool to investigate specific events and to get better analyses and insights from processes overall. This can also assist in trend analyses. Where there are no entries for some of these time points, we may need to create alternative elapsed time points to create our steps. Those decisions are part of this project's goals.
+
+You will note there are some columns duplicated because they are meant to be used for different analyses using the same dataset. Traditionally, we shouldn't have to do this, but I chose to make this distinction for ease of use.
+
+## Data Analysis
+
+### Missing Data
+
+Looking at the dataset, here is a graph of missing data:
+
+```{r missing_data, warn_large_data=FALSE}
+#| echo: false
+
+library(naniar)
+gg_miss_var(df)
+```
+
+The graph shows that we have over 70,000 calls where we never recorded an arrival to the event. We might need to add a disposition for the calls to see if there is a correlation between missing values and disposition codes. I've included a printout of the number of missing rows by column to assist in the numbers. 
+
+```{r missing_data_count, warn_large_data = FALSE}
+#| echo: false
+
+apply(X = is.na(df), MARGIN = 2, FUN = sum)
+```
+
+With this information, we will need to address some of the NULL values in order to determine if there are any correlations. Immediately, you can see that the steps where the arrival time is missing also have missing values. 
+
+```{r replace_nas}
+#| echo: false
+#| output: false
+
+df$Reception <- tidyr::replace_na(df$Reception, "NOT RECORDED")
+df$Problem <- tidyr::replace_na(df$Problem, "UNKNOWN")
+df$Priority <- tidyr::replace_na(df$Priority, 99)
+df$Jurisdiction <- tidyr::replace_na(df$Jurisdiction, "UNKNOWN")
+```
+
+We can repeat the graph to ensure that there are no longer any missing values for these four columns. 
+
+```{r missing_data2, warn_large_data=FALSE}
+#| echo: false
+
+library(naniar)
+gg_miss_var(df)
+```
+
+Now that we have those addressed, let's look at how many negative values we have across the thirteen month period. For this, I'm going to create a variable for each of the numeric columns, except Priority, and calculate a percentage of the data we do have that is negative and missing. That table can be found below:
+
+```{r missing_and_negative_counts, warn_large_data = FALSE}
+#| echo: false
+#| output: false
+
+delta1_neg <- sum(df$DELTA_RD_CST < 0, na.rm = TRUE)
+delta2_neg <- sum(df$DELTA_RD_TPU < 0, na.rm = TRUE)
+delta3_neg <- sum(df$DELTA_RD_FTPU < 0, na.rm = TRUE)
+delta4_neg <- sum(df$DELTA_RD_FCTK < 0, na.rm = TRUE)
+delta5_neg <- sum(df$DELTA_CST_TPU < 0, na.rm = TRUE)
+delta6_neg <- sum(df$DELTA_CST_FTPU < 0, na.rm = TRUE)
+delta7_neg <- sum(df$DELTA_CST_FCTK < 0, na.rm = TRUE)
+delta8_neg <- sum(df$DELTA_TPU_FTPU < 0, na.rm = TRUE)
+delta9_neg <- sum(df$DELTA_TPU_FCTK < 0, na.rm = TRUE)
+delta10_neg <- sum(df$DELTA_FTPU_FCTK < 0, na.rm = TRUE)
+delta_queues_net <- sum(df$DELTA_QUEUEs < 0, na.rm = TRUE)
+delta_ct <- sum(df$DELTA_CALLTAKING < 0, na.rm = TRUE)
+delta_step1_neg <- sum(df$STEP_1 < 0, na.rm = TRUE)
+delta_step2_net <- sum(df$STEP_2 < 0, na.rm = TRUE)
+```

@@ -1,0 +1,28 @@
+---
+title: "My simple Quarto file"
+format: html
+---
+
+## Cars are great
+
+Here is some math:
+
+$1 + 1$
+
+When you render this file, a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+```{r cars}
+summary(cars)
+```
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+What a great plot!

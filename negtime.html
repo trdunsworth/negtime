@@ -124,7 +124,7 @@ Important
 <li>Jurisdiction: <em>This indicates for whom the call was run.</em></li>
 <li>Response_Date: <em>This, per CS, is the timestamp indicating when the ID was created and is frequently used, by them, as the <strong>start</strong> of the call.</em></li>
 <li>ClockStartTime: <em>This should be, per CS, the <strong>actual</strong> starting point for the call.</em></li>
-<li>Time_PhonePickUp: <em>This timestamp indentifies when the CAD acknowledged the start of the phone call for the event.</em></li>
+<li>Time_PhonePickUp: <em>This timestamp identifies when the CAD acknowledged the start of the phone call for the event.</em></li>
 <li>Fixed_Time_PhonePickUp: <em>This timestamp also identifies when the CAD acknowledged the start of the phone call for the event, but is deemed <strong>immutable</strong> by the software.</em></li>
 <li>Time_FirstCallTakingKeystroke: <em>This timestamp identifies when the CAD software registers the first keystroke related to the event</em></li>
 <li>DELTA_RD_CST: <em>This is the difference, hence Δ, between the Response_Date and ClockStartTime columns.</em></li>
@@ -159,7 +159,7 @@ Important
 <li>CALL_TIME: <em>This is the time difference between the Time_PhonePickUp and Time_CallTakingComplete columns.</em></li>
 <li>STEP_4: <em>This is the time difference between the Time_CallEnteredQueue and Time_First_Unit_Assigned columns.</em></li>
 <li>STEP_5: <em>This is the time difference between the Time_First_Unit_Assigned and TimeFirstUnitDispatchAcknowledged columns.</em></li>
-<li>STEP_6: <em>This is the time difference between the TimeFirstUnitDispatchAcknowledged and Time_First_Unit_Enrote columns.</em></li>
+<li>STEP_6: <em>This is the time difference between the TimeFirstUnitDispatchAcknowledged and Time_First_Unit_Enroute columns.</em></li>
 <li>STEP_7: <em>This is the time difference between the Time_First_Unit_Enroute and Time_First_Unit_Arrived columns.</em></li>
 <li>STEP_8: <em>This is the time difference between the Time_First_Unit_Arrived and TimeFirstCallCleared columns.</em></li>
 <li>STEP_9: <em>This is the time difference between the TimeFirstCallCleared and Time_CallClosed columns.</em></li>
@@ -181,7 +181,7 @@ Note
 <p>Please note that there should not be, if calls are not re-opened, any delta between a time stamp and its ‘Fixed’ counterpart.</p>
 </div>
 </div>
-<p>In the list above, the Steps columns are meant to follow a call from the time the clock starts to the time the clock stops. I’ve identified a possible 10 step timing chain that wouild allow us to step through the history of a call. There are multiple possible steps for the second step depending on management preferences. Once we have established the chain time wise, then we can use these steps as a tool to investigate specific events and to get better analyses and insights from processes overall. This can also assist in trend analyses. Where there are no entries for some ofthese time points, we may need to create alternative elapsed time points to create our steps. Those decisions are part of this project’s goals.</p>
+<p>In the list above, the Steps columns are meant to follow a call from the time the clock starts to the time the clock stops. I’ve identified a possible 10 step timing chain that would allow us to step through the history of a call. There are multiple possible steps for the second step depending on management preferences. Once we have established the chain time wise, then we can use these steps as a tool to investigate specific events and to get better analyses and insights from processes overall. This can also assist in trend analyses. Where there are no entries for some of these time points, we may need to create alternative elapsed time points to create our steps. Those decisions are part of this project’s goals.</p>
 <p>You will note there are some columns duplicated because they are meant to be used for different analyses using the same dataset. Traditionally, we shouldn’t have to do this, but I chose to make this distinction for ease of use.</p>
 </section>
 </section>
@@ -199,7 +199,76 @@ Note
 </div>
 </div>
 </div>
-<p>As you can see from the graph above, the biggest issues that we see are with TimeFirstUnitDispatchAcknowledged and Time_First_Unit_Assigned with a large majority of the rows where they are absent. While the first showing an acknowledgement is not an issue. I can safely recommend that it be removed and we leave it out of future research work, I am very concerned about the Time_First_Unit_Assigned being so sparse. If we are called on by the City to discuss overall response time, not knowing when we started assigning units to a call presents a large-scale problem for DECC and the City. However, a brief visual inspection does not appear to support the graph’s assertion that over 150,000 rows have a missing value.</p>
+<p>As you can see from the graph above, the biggest issues that we see are with TimeFirstUnitDispatchAcknowledged and Time_First_Unit_Assigned with a large majority of the rows where they are absent. While the first showing an acknowledgement is not an issue. I can safely recommend that it be removed and we leave it out of future research work, I am very concerned about the Time_First_Unit_Assigned being so sparse. If we are called on by the City to discuss overall response time, not knowing when we started assigning units to a call presents a large-scale problem for DECC and the City. However, a brief visual inspection does not appear to support the graph’s assertion that over 150,000 rows have a missing value. Let’s try this with another method, using <code>apply()</code> to count the number of rows.</p>
+<div class="cell" data-warn_large_data="false">
+<div class="cell-output cell-output-stdout">
+<pre><code>               ID         Reception           Problem          Priority 
+                0             15676             23858             23861 
+           Agency      Jurisdiction     Response_Date       Clock_Start 
+                0                77                 0              8241 
+      Phone_Start Fixed_Phone_Start   First_Keystroke      DELTA_RD_CST 
+             6450              6516              6450              8241 
+     DELTA_RD_TPU     DELTA_RD_FTPU     DELTA_RD_FCTK     DELTA_CST_TPU 
+             6450              6516              6450             10168 
+   DELTA_CST_FTPU    DELTA_CST_FCTK    DELTA_TPU_FTPU    DELTA_TPU_FCTK 
+            10234             10168              6516              6450 
+  DELTA_FTPU_FCTK            Viewed            Queued      Fixed_Queued 
+             6516             73125                 0                 0 
+     DELTA_QUEUES         Phone_End   Fixed_Phone_End  DELTA_CALLTAKING 
+                0              6450              6450              6450 
+   First_Dispatch         First_Ack     First_Enroute     First_Arrived 
+           178780            178780             64274             73291 
+      First_Clear       Call_Closed Fixed_Call_Closed            STEP_1 
+            67202                95                82             10168 
+           STEP_2           STEP_2A           STEP_2B            STEP_3 
+             6450             75013             73125              6450 
+        CALL_TIME            STEP_4            STEP_5            STEP_6 
+             6450             62044             70821             70823 
+           STEP_7            STEP_8            STEP_9           STEP_10 
+            73291             76129             67204             73292 
+     TOTAL_TIME_A      TOTAL_TIME_B 
+               95              8334 </code></pre>
+</div>
+</div>
+<p>This is concerning because that doesn’t match what’s in the dataframe itself. This claims that for both of these columns, the entire columns is NA.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 50
+       ID Reception Problem     Priority Agency Jurisdiction Response_Date      
+    &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;          &lt;int&gt; &lt;chr&gt;  &lt;chr&gt;        &lt;dttm&gt;             
+1 2659640 E-911     911 TRANSF…        7 LAW    Alexandria … 2024-01-01 00:01:09
+2 2659641 E-911     BLS EMERGE…        3 FIRE   200 ALX      2024-01-01 00:02:05
+3 2659642 E-911     &lt;NA&gt;              NA DEC    DEC          2024-01-01 00:02:54
+4 2659643 E-911     &lt;NA&gt;              NA DEC    DEC          2024-01-01 00:03:36
+5 2659644 E-911     DWI - DRUN…        2 LAW    Alexandria … 2024-01-01 00:03:54
+6 2659645 E-911     &lt;NA&gt;              NA DEC    DEC          2024-01-01 00:04:02
+# ℹ 43 more variables: Clock_Start &lt;dttm&gt;, Phone_Start &lt;dttm&gt;,
+#   Fixed_Phone_Start &lt;dttm&gt;, First_Keystroke &lt;dttm&gt;, DELTA_RD_CST &lt;int&gt;,
+#   DELTA_RD_TPU &lt;int&gt;, DELTA_RD_FTPU &lt;int&gt;, DELTA_RD_FCTK &lt;int&gt;,
+#   DELTA_CST_TPU &lt;int&gt;, DELTA_CST_FTPU &lt;int&gt;, DELTA_CST_FCTK &lt;int&gt;,
+#   DELTA_TPU_FTPU &lt;int&gt;, DELTA_TPU_FCTK &lt;int&gt;, DELTA_FTPU_FCTK &lt;int&gt;,
+#   Viewed &lt;dttm&gt;, Queued &lt;dttm&gt;, Fixed_Queued &lt;dttm&gt;, DELTA_QUEUES &lt;int&gt;,
+#   Phone_End &lt;dttm&gt;, Fixed_Phone_End &lt;dttm&gt;, DELTA_CALLTAKING &lt;int&gt;, …</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 50
+       ID Reception Problem     Priority Agency Jurisdiction Response_Date      
+    &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;          &lt;int&gt; &lt;chr&gt;  &lt;chr&gt;        &lt;dttm&gt;             
+1 2861842 Phone     NOISE COMP…        4 LAW    Alexandria … 2025-01-31 23:48:38
+2 2861843 Phone     ALARM COMM…        2 LAW    Alexandria … 2025-01-31 23:53:14
+3 2861844 Phone     PUBLIC SER…        3 LAW    Alexandria … 2025-01-31 23:54:34
+4 2861845 &lt;NA&gt;      &lt;NA&gt;              NA DEC    DEC          2025-01-31 23:58:56
+5 2861846 E-911     &lt;NA&gt;              NA DEC    DEC          2025-01-31 23:59:14
+6 2861847 E-911     UNCONSCIOU…        1 FIRE   200 ALX      2025-01-31 23:59:33
+# ℹ 43 more variables: Clock_Start &lt;dttm&gt;, Phone_Start &lt;dttm&gt;,
+#   Fixed_Phone_Start &lt;dttm&gt;, First_Keystroke &lt;dttm&gt;, DELTA_RD_CST &lt;int&gt;,
+#   DELTA_RD_TPU &lt;int&gt;, DELTA_RD_FTPU &lt;int&gt;, DELTA_RD_FCTK &lt;int&gt;,
+#   DELTA_CST_TPU &lt;int&gt;, DELTA_CST_FTPU &lt;int&gt;, DELTA_CST_FCTK &lt;int&gt;,
+#   DELTA_TPU_FTPU &lt;int&gt;, DELTA_TPU_FCTK &lt;int&gt;, DELTA_FTPU_FCTK &lt;int&gt;,
+#   Viewed &lt;dttm&gt;, Queued &lt;dttm&gt;, Fixed_Queued &lt;dttm&gt;, DELTA_QUEUES &lt;int&gt;,
+#   Phone_End &lt;dttm&gt;, Fixed_Phone_End &lt;dttm&gt;, DELTA_CALLTAKING &lt;int&gt;, …</code></pre>
+</div>
+</div>
 </section>
 </section>
 </section>

@@ -416,6 +416,24 @@
       ],
       "Hash": "9e99e28d9ed4af128bc3d1ba0f15a63e"
     },
+    "UpSetR": {
+      "Package": "UpSetR",
+      "Version": "1.4.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "ggplot2",
+        "grDevices",
+        "gridExtra",
+        "methods",
+        "plyr",
+        "scales",
+        "stats",
+        "utils"
+      ],
+      "Hash": "f6ef89503aaff474873f8bc1823894e1"
+    },
     "V8": {
       "Package": "V8",
       "Version": "6.0.1",
@@ -2964,6 +2982,33 @@
       ],
       "Hash": "c7241e6be9d6df551a2e539a50f5c875"
     },
+    "naniar": {
+      "Package": "naniar",
+      "Version": "1.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "UpSetR",
+        "cli",
+        "dplyr",
+        "forcats",
+        "ggplot2",
+        "glue",
+        "lifecycle",
+        "magrittr",
+        "norm",
+        "purrr",
+        "rlang",
+        "stats",
+        "tibble",
+        "tidyr",
+        "vctrs",
+        "viridis",
+        "visdat"
+      ],
+      "Hash": "74d1b68ee4d1e076dee034a9ef3acd41"
+    },
     "nlme": {
       "Package": "nlme",
       "Version": "3.1-166",
@@ -2996,6 +3041,16 @@
         "utils"
       ],
       "Hash": "2c797b46eea7fb58ede195bc0b1f1138"
+    },
+    "norm": {
+      "Package": "norm",
+      "Version": "1.0-11.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "stats"
+      ],
+      "Hash": "82d9d75b78bc83553c034cd5c7ed2b3c"
     },
     "nortest": {
       "Package": "nortest",
