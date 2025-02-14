@@ -35,6 +35,8 @@
         "tidymodels",
         "tidyr",
         "tidyverse",
+        "timea",
+        "timeb",
         "viridis",
         "visdat"
     ]
