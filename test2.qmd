@@ -273,3 +273,9 @@ total_timeb_na <- sum(is.na(df$TOTAL_TIME_B))
 |:------:|:-------------:|:-------:|:--------------:|:-------------:|
 | DELTA_RD_CST | `{r} print(delta1_neg)` | `{r} print(delta1_na)` | `{r} print(round(delta1_neg/(nrow(df)-delta1_na)*100, digits=2))` | `{r} print(round(delta1_na/nrow(df)*100, digits=2))` |
 | DELTA_RD_TPU | `{r} print(delta2_neg)` | `{r} print(delta2_na)` | `{r} print(round(delta2_neg/(nrow(df)-delta2_na)*100, digits=2))` | `{r} print(round(delta2_na/nrow(df)*100, digits=2))` |
+| DELTA_RD_FTPU | `{r} print(delta3_neg)` | `{r} print(delta3_na)` | `{r} print(round(delta3_neg/(nrow(df)-delta3_na)*100, digits=2))` | `{r} print(round(delta3_na/nrow(df)*100, digits=2))` |
+| DELTA_RD_FCTK | `{r} print(delta4_neg)` | `{r} print(delta4_na)` | `{r} print(round(delta4_neg/(nrow(df)-delta4_na)*100, digits=2))` | `{r} print(round(delta4_na/nrow(df)*100, digits=2))` |
+| DELTA_CST_TPU | `{r} print(delta5_neg)` | `{r} print(delta5_na)` | `{r} print(round(delta5_neg/(nrow(df)-delta5_na)*100, digits=2))` | `{r} print(round(delta5_na/nrow(df)*100, digits=2))` |
+| DELTA_CST_FTPU | `{r} print(delta6_neg)` | `{r} print(delta6_na)` | `{r} print(round(delta6_neg/(nrow(df)-delta6_na)*100, digits=2))` | `{r} print(round(delta6_na/nrow(df)*100, digits=2))` |
+| DELTA_CST_FCTK | `{r} print(delta7_neg)` | `{r} print(delta7_na)` | `{r} print(round(delta7_neg/(nrow(df)-delta7_na)*100, digits=2))` | `{r} print(round(delta7_na/nrow(df)*100, digits=2))` |
+| DELTA_TPU_FTPU | `{r} print(delta8_neg)` | `{r} print(delta8_na)` | `{r} print(round(delta8_neg/(nrow(df)-delta8_na)*100, digits=2))` | `{r} print(round(delta8_na/nrow(df)*100, digits=2))` |
