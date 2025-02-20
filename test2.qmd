@@ -279,4 +279,8 @@ total_timeb_na <- sum(is.na(df$TOTAL_TIME_B))
 | DELTA_CST_FTPU | `{r} print(delta6_neg)` | `{r} print(delta6_na)` | `{r} print(round(delta6_neg/(nrow(df)-delta6_na)*100, digits=2))` | `{r} print(round(delta6_na/nrow(df)*100, digits=2))` |
 | DELTA_CST_FCTK | `{r} print(delta7_neg)` | `{r} print(delta7_na)` | `{r} print(round(delta7_neg/(nrow(df)-delta7_na)*100, digits=2))` | `{r} print(round(delta7_na/nrow(df)*100, digits=2))` |
 | DELTA_TPU_FTPU | `{r} print(delta8_neg)` | `{r} print(delta8_na)` | `{r} print(round(delta8_neg/(nrow(df)-delta8_na)*100, digits=2))` | `{r} print(round(delta8_na/nrow(df)*100, digits=2))` |
-| DELTA_TPU_FCTK | `{r} print(delta9_neg)` | `{r} print(delta9_na)` | 
+| DELTA_TPU_FCTK | `{r} print(delta9_neg)` | `{r} print(delta9_na)` | `{r} print(round(delta9_neg/(nrow(df)-delta9_na)*100, digits=2))` | `{r} print(round(delta9_na/nrow(df)*100, digits=2))` |
+| DELTA_FTPU_FCTK | `{r} print(delta10_neg)` | `{r} print(delta10_na)` | `{r} print(round(delta10_neg/(nrow(df)-delta10_na)*100, digits=2))` | `{r} print(round(delta10_na/nrow(df)*100, digits=2))` |
+| DELTA_QUEUES | `{r} print(delta_queues_neg)` | `{r} print(delta_queues_na)` | `{r} print(round(delta_queues_neg/(nrow(df)-delta_queues_na)*100, digits=2))` | `{r} print(round(delta_queues_na/nrow(df)*100, digits=2))` |
+| DELTA_CALLTAKING | `{r} print(delta_ct_neg)` | `{r} print(delta_ct_na)` | `{r} print(round(delta_ct_neg/(nrow(df)-delta_ct_na)*100, digits=2))` | `{r} print(round(delta_ct_na/nrow(df)*100, digits=2))` |
+| STEP_1 | `{r} print(delta_step1_neg)` | `{r} print(delta_step1_na)` | `{r} print(round(delta_step1_neg/(nrow(df)-delta_step1_na)*100, digits=2))` | `{r} print(round(delta_step1_na/nrow(df)*100, digits=2))` |
