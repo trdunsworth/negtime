@@ -279,3 +279,4 @@ total_timeb_na <- sum(is.na(df$TOTAL_TIME_B))
 | DELTA_CST_FTPU | `{r} print(delta6_neg)` | `{r} print(delta6_na)` | `{r} print(round(delta6_neg/(nrow(df)-delta6_na)*100, digits=2))` | `{r} print(round(delta6_na/nrow(df)*100, digits=2))` |
 | DELTA_CST_FCTK | `{r} print(delta7_neg)` | `{r} print(delta7_na)` | `{r} print(round(delta7_neg/(nrow(df)-delta7_na)*100, digits=2))` | `{r} print(round(delta7_na/nrow(df)*100, digits=2))` |
 | DELTA_TPU_FTPU | `{r} print(delta8_neg)` | `{r} print(delta8_na)` | `{r} print(round(delta8_neg/(nrow(df)-delta8_na)*100, digits=2))` | `{r} print(round(delta8_na/nrow(df)*100, digits=2))` |
+| DELTA_TPU_FCTK | `{r} print(delta9_neg)` | `{r} print(delta9_na)` | 
