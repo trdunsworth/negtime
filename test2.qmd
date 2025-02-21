@@ -260,7 +260,7 @@ delta_step3_na <- sum(is.na(df$STEP_3))
 call_time_na <- sum(is.na(df$CALL_TIME))
 delta_step4_na <- sum(is.na(df$STEP_4))
 delta_step5_na <- sum(is.na(df$STEP_5))
-delta_step6_na <- sum(is.na(df$DELTA_6))
+delta_step6_na <- sum(is.na(df$STEP_6))
 delta_step7_na <- sum(is.na(df$STEP_7))
 delta_step8_na <- sum(is.na(df$STEP_8))
 delta_step9_na <- sum(is.na(df$STEP_9))
@@ -284,3 +284,6 @@ total_timeb_na <- sum(is.na(df$TOTAL_TIME_B))
 | DELTA_QUEUES | `{r} print(delta_queues_neg)` | `{r} print(delta_queues_na)` | `{r} print(round(delta_queues_neg/(nrow(df)-delta_queues_na)*100, digits=2))` | `{r} print(round(delta_queues_na/nrow(df)*100, digits=2))` |
 | DELTA_CALLTAKING | `{r} print(delta_ct_neg)` | `{r} print(delta_ct_na)` | `{r} print(round(delta_ct_neg/(nrow(df)-delta_ct_na)*100, digits=2))` | `{r} print(round(delta_ct_na/nrow(df)*100, digits=2))` |
 | STEP_1 | `{r} print(delta_step1_neg)` | `{r} print(delta_step1_na)` | `{r} print(round(delta_step1_neg/(nrow(df)-delta_step1_na)*100, digits=2))` | `{r} print(round(delta_step1_na/nrow(df)*100, digits=2))` |
+| STEP_2 | `{r} print(delta_step2_neg)` | `{r} print(delta_step2_na)` | `{r} print(round(delta_step2_neg/(nrow(df)-delta_step2_na)*100, digits=2))` | `{r} print(round(delta_step2_na/nrow(df)*100, digits=2))` |
+| STEP_2A | `{r} print(delta_step2a_neg)` | `{r} print(delta_step2a_na)` | `{r} print(round(delta_step2a_neg/(nrow(df)-delta_step2a_na)*100, digits=2))` | `{r} print(round(delta_step2a_na/nrow(df)*100, digits=2))` |
+| STEP_2B | `{r} print(delta_step2b_neg)` | `{r} print(delta_step2b_na)` | `{r} print(round(delta_step2b_neg/(nrow(df)-delta)))
