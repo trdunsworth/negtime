@@ -286,4 +286,7 @@ total_timeb_na <- sum(is.na(df$TOTAL_TIME_B))
 | STEP_1 | `{r} print(delta_step1_neg)` | `{r} print(delta_step1_na)` | `{r} print(round(delta_step1_neg/(nrow(df)-delta_step1_na)*100, digits=2))` | `{r} print(round(delta_step1_na/nrow(df)*100, digits=2))` |
 | STEP_2 | `{r} print(delta_step2_neg)` | `{r} print(delta_step2_na)` | `{r} print(round(delta_step2_neg/(nrow(df)-delta_step2_na)*100, digits=2))` | `{r} print(round(delta_step2_na/nrow(df)*100, digits=2))` |
 | STEP_2A | `{r} print(delta_step2a_neg)` | `{r} print(delta_step2a_na)` | `{r} print(round(delta_step2a_neg/(nrow(df)-delta_step2a_na)*100, digits=2))` | `{r} print(round(delta_step2a_na/nrow(df)*100, digits=2))` |
-| STEP_2B | `{r} print(delta_step2b_neg)` | `{r} print(delta_step2b_na)` | `{r} print(round(delta_step2b_neg/(nrow(df)-delta)))
+| STEP_2B | `{r} print(delta_step2b_neg)` | `{r} print(delta_step2b_na)` | `{r} print(round(delta_step2b_neg/(nrow(df)-delta_step2b_na)*100, digits=2))` | `{r} print(round(delta_step2b_na/nrow(df)*100, digits=2))` |
+
+
+Quick notes: We should not use TimeCallViewed in the process. There are too many 
