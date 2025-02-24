@@ -229,7 +229,7 @@ delta_step2_neg <- sum(df$STEP_2 < 0, na.rm = TRUE)
 delta_step2a_neg <- sum(df$STEP_2A < 0, na.rm = TRUE)
 delta_step2b_neg <- sum(df$STEP_2B < 0, na.rm = TRUE)
 delta_step3_neg <- sum(df$STEP_3 < 0, na.rm = TRUE)
-call_time_neg <- sum(df$CALL_TIME , 0, na.rm = TRUE)
+call_time_neg <- sum(df$CALL_TIME < 0, na.rm = TRUE)
 delta_step4_neg <- sum(df$STEP_4 < 0, na.rm = TRUE)
 delta_step5_neg <- sum(df$STEP_5 < 0, na.rm = TRUE)
 delta_step6_neg <- sum(df$STEP_6 < 0, na.rm = TRUE)
@@ -289,8 +289,16 @@ total_timeb_na <- sum(is.na(df$TOTAL_TIME_B))
 | STEP_2B | `{r} print(delta_step2b_neg)` | `{r} print(delta_step2b_na)` | `{r} print(round(delta_step2b_neg/(nrow(df)-delta_step2b_na)*100, digits=2))` | `{r} print(round(delta_step2b_na/nrow(df)*100, digits=2))` |
 | STEP_3 | `{r} print(delta_step3_neg)` | `{r} print(delta_step3_na)` | `{r} print(round(delta_step3_neg/(nrow(df)-delta_step3_na)*100, digits=2))` | `{r} print(round(delta_step3_na/nrow(df)*100, digits=2))` |
 | CALL_TIME | `{r} print(call_time_neg)` | `{r} print(call_time_na)` | `{r} print(round(call_time_neg/(nrow(df)-call_time_na)*100, digits=2))` | `{r} print(round(call_time_na/nrow(df)*100, digits=2))` |
-| STEP_4 | `{r} print(delta_step4_neg)` | `{r} print(delta_step4_na)` | `{r} print(round(delta_step4_neg/(nrow(df)-delta_step4_na)*100, digits=2))` |
-
-
+| STEP_4 | `{r} print(delta_step4_neg)` | `{r} print(delta_step4_na)` | `{r} print(round(delta_step4_neg/(nrow(df)-delta_step4_na)*100, digits=2))` | `{r} print(round(delta_step4_na/nrow(df)*100, digits=2))` |
+| STEP_5 | `{r} print(delta_step5_neg)` | `{r} print(delta_step5_na)` | `{r} print(round(delta_step5_neg/(nrow(df)-delta_step5_na)*100, digits=2))` | `{r} print(round(delta_step5_na/nrow(df)*100, digits=2))` |
+| STEP_6 | `{r} print(delta_step6_neg)` | `{r} print(delta_step6_na)` | `{r} print(round(delta_step6_neg/(nrow(df)-delta_step6_na)*100, digits=2))` | `{r} print(round(delta_step6_na/nrow(df)*100, digits=2))` |
+| STEP_7 | `{r} print(delta_step7_neg)` | `{r} print(delta_step7_na)` | `{r} print(round(delta_step7_neg/(nrow(df)-delta_step7_na)*100, digits=2))` | `{r} print(round(delta_step7_na/nrow(df)*100, digits=2))` |
+| STEP_8 | `{r} print(delta_step8_neg)` | `{r} print(delta_step8_na)` | `{r} print(round(delta_step8_neg/(nrow(df)-delta_step8_na)*100, digits=2))` | `{r} print(round(delta_step8_na/nrow(df)*100, digits=2))` |
+| STEP_9 | `{r} print(delta_step9_neg)` | `{r} print(delta_step9_na)` | `{r} print(round(delta_step9_neg/(nrow(df)-delta_step9_na)*100, digits=2))` | `{r} print(round(delta_step9_na/nrow(df)*100, digits=2))` |
+| STEP_10 | `{r} print(delta_step10_neg)` | `{r} print(delta_step10_na)` | `{r} print(round(delta_step10_neg/(nrow(df)-delta_step10_na)*100, digits=2))` | `{r} print(round(delta_step10_na/nrow(df)*100, digits=2))` |
+| TOTAL_TIME_A | `{r} print(total_timea_neg)` | `{r} print(total_timea_na)` | `{r} print(round(total_timea_neg/(nrow(df)-total_timea_na)*100, digits=2))` | `{r} print(round(total_timea_na/nrow(df)*100, digits=2))` |
+| TOTAL_TIME_B | `{r} print(total_timeb_neg)` | `{r} print(total_timeb_na)` | `{r} print(round(total_timeb_neg/(nrow(df)-total_timeb_na)*100, digits=2))` | `{r} print(round(total_timeb_na/nrow(df)*100, digits=2))` |
 
 Quick notes: We should not use TimeCallViewed in the process. There are too many missing values 
+
+Prism Theme for Positron. (NOTE)
