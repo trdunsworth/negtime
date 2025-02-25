@@ -56,6 +56,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#data-analysis" id="toc-data-analysis" class="nav-link" data-scroll-target="#data-analysis"><span class="header-section-number">1.3</span> Data Analysis</a>
   <ul class="collapse">
   <li><a href="#missing-data" id="toc-missing-data" class="nav-link" data-scroll-target="#missing-data"><span class="header-section-number">1.3.1</span> Missing Data</a></li>
+  <li><a href="#initial-observations" id="toc-initial-observations" class="nav-link" data-scroll-target="#initial-observations"><span class="header-section-number">1.3.2</span> Initial Observations</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -500,7 +501,62 @@ Note
 </tr>
 </tbody>
 </table>
-<p>Quick notes: We should not use TimeCallViewed in the process. There are too many missing values</p>
+<p>Because of the way the programming language processes our requests, I’m going to reverse the fields in a few of the areas where I have no negative time-to-event values to ensure that both directions are equal in value counts.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Column</th>
+<th style="text-align: center;">Negative Rows</th>
+<th style="text-align: center;">NA Rows</th>
+<th style="text-align: center;">Neg Percentage</th>
+<th style="text-align: center;">NA Percentage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">DELTA_TPU_FTPU2</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">6516</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">3.64</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">DELTA_TPU_FCTK2</td>
+<td style="text-align: center;">93554</td>
+<td style="text-align: center;">6450</td>
+<td style="text-align: center;">54.29</td>
+<td style="text-align: center;">3.61</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">DELTA_FTPU_FCTK2</td>
+<td style="text-align: center;">93554</td>
+<td style="text-align: center;">6516</td>
+<td style="text-align: center;">54.31</td>
+<td style="text-align: center;">3.64</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">DELTA_QUEUES2</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">DELTA_CALLTAKING2</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">6450</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">3.61</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="initial-observations" class="level3" data-number="1.3.2">
+<h3 data-number="1.3.2" class="anchored" data-anchor-id="initial-observations"><span class="header-section-number">1.3.2</span> Initial Observations</h3>
+<p>Initially, it should be noted that there are a lot of negative time-to-event values between the Response_Date and both of the timestamps for when the phone is picked up. This could imply that the Response_Date column is also being impacted, at times, when the call is reopened. If this is the case, then I would recommend using that column for fencing entries and, even then, with caution. You can also see a lot of negative values between the ClockStartTime and the phone pickups. Again, this implies, to me, that this column may not be the most accurate. From appearances, I would recommend future analyses start with the Fixed_Time_PhonePickup as the initial point and disregard the call start time.</p>
+<p>I am pleased to see that there are no negative time-to-event values between the Time_PhonePickUp and Fixed_Time_PhonePickUp columns. That implies that there are no issues with reopening calls there. I would recommend using the <em>Fixed</em> value whenever possible. Those are implied to be immutable per CentralSquare. I am also pleased to see that see there are no negative time-to-event values for the span between the phone pickup and the first calltaking keystroke. This gives us the first two steps in an overarching analysis of the call process. The only drawback I saw is in the number of rows missing for both the Time_PhonePickUp and Fixed_Time_PhonePickUp columns. There are 6450 and 6516 missing rows respectively. These represent 3.61 percent and 3.64 percent of the columns missing respectively. The good news is that, at under 5% of the dataset, initial EDA and other preliminary work can safely discard those columns.</p>
+<p>We should abandon the TimeCallViewed column. There are too many missing values. Attempting to use this column in time-to-event analyses resulted in over 40% of those events having missing data. While abandoned calls may be considered censored in survival analyses, applying censoring rules to these columns renders that column inert analytically. Therefore abandoning the column is the only analytical course of action.</p>
+<p>Another positive observation was a lack of negative values between the time stamps for calls entering the dispatch queue. Additionally, there were no missing values between the two columns either. So we appear to be able to use either column, again I recommend defaulting to the <em>Fixed</em> alternative for analytical purposes.</p>
 </section>
 </section>
 </section>

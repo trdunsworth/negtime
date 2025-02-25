@@ -299,6 +299,76 @@ total_timeb_na <- sum(is.na(df$TOTAL_TIME_B))
 | TOTAL_TIME_A | `{r} print(total_timea_neg)` | `{r} print(total_timea_na)` | `{r} print(round(total_timea_neg/(nrow(df)-total_timea_na)*100, digits=2))` | `{r} print(round(total_timea_na/nrow(df)*100, digits=2))` |
 | TOTAL_TIME_B | `{r} print(total_timeb_neg)` | `{r} print(total_timeb_na)` | `{r} print(round(total_timeb_neg/(nrow(df)-total_timeb_na)*100, digits=2))` | `{r} print(round(total_timeb_na/nrow(df)*100, digits=2))` |
 
-Quick notes: We should not use TimeCallViewed in the process. There are too many missing values 
+Because of the way the programming language processes our requests, I'm going to reverse the fields in a few of the areas where I have no negative time-to-event values to ensure that both directions are equal in value counts. 
 
-Prism Theme for Positron. (NOTE)
+``` {r missing_and_neg2, warn_large_data = FALSE}
+#| echo: false
+#| output: false
+
+delta8a_neg <- sum(df$DELTA_TPU_FTPU > 0, na.rm = TRUE)
+delta9a_neg <- sum(df$DELTA_TPU_FCTK > 0, na.rm = TRUE)
+delta10a_neg <- sum(df$DELTA_FTPU_FCTK > 0, na.rm = TRUE)
+delta_queuesa_neg <- sum(df$DELTA_QUEUES > 0, na.rm = TRUE)
+delta_cta_neg <- sum(df$DELTA_CALLTAKING > 0, na.rm = TRUE)
+```
+
+| Column | Negative Rows | NA Rows | Neg Percentage | NA Percentage |
+|:------:|:-------------:|:-------:|:--------------:|:-------------:|
+| DELTA_TPU_FTPU2 | `{r} print(delta8a_neg)` | `{r} print(delta8_na)` | `{r} print(round(delta8a_neg/(nrow(df)-delta8_na)*100, digits=2))` | `{r} print(round(delta8_na/nrow(df)*100, digits=2))` |
+| DELTA_TPU_FCTK2 | `{r} print(delta9a_neg)` | `{r} print(delta9_na)` | `{r} print(round(delta9a_neg/(nrow(df)-delta9_na)*100, digits=2))` | `{r} print(round(delta9_na/nrow(df)*100, digits=2))` |
+| DELTA_FTPU_FCTK2 | `{r} print(delta10a_neg)` | `{r} print(delta10_na)` | `{r} print(round(delta10a_neg/(nrow(df)-delta10_na)*100, digits=2))` | `{r} print(round(delta10_na/nrow(df)*100, digits=2))` |
+| DELTA_QUEUES2 | `{r} print(delta_queuesa_neg)` | `{r} print(delta_queues_na)` | `{r} print(round(delta_queuesa_neg/(nrow(df)-delta_queues_na)*100, digits=2))` | `{r} print(round(delta_queues_na/nrow(df)*100, digits=2))` |
+| DELTA_CALLTAKING2 | `{r} print(delta_cta_neg)` | `{r} print(delta_ct_na)` | `{r} print(round(delta_cta_neg/(nrow(df)-delta_ct_na)*100, digits=2))` | `{r} print(round(delta_ct_na/nrow(df)*100, digits=2))` |
+
+
+### Initial Observations
+
+Initially, it should be noted that there are a lot of negative time-to-event values between the Response_Date and both of the timestamps for when the phone is picked up. This could imply that the Response_Date column is also being impacted, at times, when the call is reopened. If this is the case, then I would recommend using that column for fencing entries and, even then, with caution. You can also see a lot of negative values between the ClockStartTime and the phone pickups. Again, this implies, to me, that this column may not be the most accurate. From appearances, I would recommend future analyses start with the Fixed_Time_PhonePickup as the initial point and disregard the call start time. 
+
+I am pleased to see that there are no negative time-to-event values between the Time_PhonePickUp and Fixed_Time_PhonePickUp columns. That implies that there are no issues with reopening calls there. I would recommend using the *Fixed* value whenever possible. Those are implied to be immutable per CentralSquare. I am also pleased to see that see there are no negative time-to-event values for the span between the phone pickup and the first calltaking keystroke. The only drawback I saw is in the number of rows missing for both the Time_PhonePickUp and Fixed_Time_PhonePickUp columns. There are `{r} print(sum(is.na(df$Phone_Start)))` and `{r} print(sum(is.na(df$Fixed_Phone_Start)))` missing rows respectively. These represent `{r} print(round(sum(is.na(df$Phone_Start))/nrow(df)*100, digits=2))` percent and `{r} print(round(sum(is.na(df$Fixed_Phone_Start))/nrow(df)*100, digits=2))` percent of the columns missing respectively. The good news is that, at under 5% of the dataset, initial EDA and other preliminary work can safely discard those columns. 
+
+We should abandon the TimeCallViewed column. There are too many missing values. Attempting to use this column in time-to-event analyses resulted in over 40% of those events having missing data. While abandoned calls may be considered censored in survival analyses, applying censoring rules to these columns renders that column inert analytically. Therefore abandoning the column is the only analytical course of action.  
+
+Another positive observation was a lack of negative values between the time stamps for calls entering the dispatch queue. Additionally, there were no missing values between the two columns either. So we appear to be able to use either column, again I recommend defaulting to the *Fixed* alternative for analytical purposes. 
+
+The reversals show that where there were no negative time-to-event values between the phone pickup timestamps, the first entering queue timestamps, the completion of the call taking process timestamps. This is heartening and allows us to select either of the two timestamps for the same event. The interesting thing to note is that there is a delta in about 50% of cases between the phone pickup and the first call taking keystroke. This confirms the idea that we can build a call flow process for survival analyses that starts with the phone pickup and continues with the first keystroke. It also shows that nearly half of the time, the timestamps for phone pickup and first keystroke are identical.
+
+### EDA
+
+Now that we know what we're facing with respect to negative values and missing values, the first stage of analysis can take place. This first summary will leave the negative values in place, but will remove the missing values from the calculation.
+
+```{r elapse_summary}
+numerics <- df[, c("DELTA_RD_CST", "DELTA_RD_TPU", "DELTA_RD_FTPU", "DELTA_RD_FCTK", "DELTA_CST_TPU", "DELTA_CST_FTPU", "DELTA_CST_FCTK", "DELTA_TPU_FTPU", "DELTA_TPU_FCTK", "DELTA_FTPU_FCTK", "DELTA_QUEUES", "DELTA_CALLTAKING", "STEP_1", "STEP_2", "CALL_TIME", "STEP_3", "STEP_4", "STEP_5", "STEP_6", "STEP_7", "STEP_8", "STEP_9", "STEP_10", "TOTAL_TIME_A", "TOTAL_TIME_B")]
+
+# Custom summary function
+custom_summary <- function(column) {
+    c(
+        Minimum = round(min(column), 2),
+        Mean = round(mean(column), 2),
+        Median = round(median(column), 2),
+        Q1 = round(quantile(column, 0.25), 2),
+        Q3 = round(quantile(column, 0.75), 2),
+        Maximum = round(max(column), 2),
+        Std_Dev = round(sd(column), 2),
+        Skewness = round(skewness(column), 2),
+        Kurtosis = round(kurtosis(column), 2)
+    )
+}
+
+# Apply the summary function to each column in the subset
+summary_table <- t(sapply(numerics, custom_summary))
+
+# Convert to data frame for better handling
+summary_table <- as.data.frame(summary_table)
+
+# Add variable names as row names
+summary_table$Variable <- rownames(summary_table)
+
+# Reorder columns to place 'Variable' at the beginning
+# summary_table <- summary_table[, c("Variable", names(summary_table)[-ncol(summary_table)])]
+summary_table <- summary_table[, c(names(summary_table)[-ncol(summary_table)])]
+
+summary_table %>%
+    kable(format = "markdown", caption = "Weekly Elapsed Time Summary Table") %>%
+    kable_styling(bootstrap_options = c("striped", "hover"))
+```
