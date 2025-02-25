@@ -342,17 +342,17 @@ numerics <- df[, c("DELTA_RD_CST", "DELTA_RD_TPU", "DELTA_RD_FTPU", "DELTA_RD_FC
 
 # Custom summary function
 custom_summary <- function(column) {
-    c(
-        Minimum = round(min(column), 2),
-        Mean = round(mean(column), 2),
-        Median = round(median(column), 2),
-        Q1 = round(quantile(column, 0.25), 2),
-        Q3 = round(quantile(column, 0.75), 2),
-        Maximum = round(max(column), 2),
-        Std_Dev = round(sd(column), 2),
-        Skewness = round(skewness(column), 2),
-        Kurtosis = round(kurtosis(column), 2)
-    )
+  c(
+    Minimum = round(min(column, na.rm = TRUE), 2),
+    Mean = round(mean(column, na.rm = TRUE), 2),
+    Median = round(median(column, na.rm = TRUE), 2),
+    Q1 = round(quantile(column, 0.25, na.rm = TRUE), 2),
+    Q3 = round(quantile(column, 0.75, na.rm = TRUE), 2),
+    Maximum = round(max(column, na.rm = TRUE), 2),
+    Std_Dev = round(sd(column, na.rm = TRUE), 2),
+    Skewness = round(e1071::skewness(column, na.rm = TRUE), 2),
+    Kurtosis = round(e1071::kurtosis(column, na.rm = TRUE), 2)
+  )
 }
 
 # Apply the summary function to each column in the subset
