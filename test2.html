@@ -34,6 +34,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="test2_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="test2_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="test2_files/libs/bootstrap/bootstrap-1bc8a17f135ab3d594c857e9f48e611b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="test2_files/libs/kePrint-0.0.1/kePrint.js"></script>
+
+<link href="test2_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
 
 
 </head>
@@ -57,6 +61,8 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#missing-data" id="toc-missing-data" class="nav-link" data-scroll-target="#missing-data"><span class="header-section-number">1.3.1</span> Missing Data</a></li>
   <li><a href="#initial-observations" id="toc-initial-observations" class="nav-link" data-scroll-target="#initial-observations"><span class="header-section-number">1.3.2</span> Initial Observations</a></li>
+  <li><a href="#eda" id="toc-eda" class="nav-link" data-scroll-target="#eda"><span class="header-section-number">1.3.3</span> EDA</a></li>
+  <li><a href="#first-visuals" id="toc-first-visuals" class="nav-link" data-scroll-target="#first-visuals"><span class="header-section-number">1.3.4</span> First Visuals</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -554,9 +560,392 @@ Note
 <section id="initial-observations" class="level3" data-number="1.3.2">
 <h3 data-number="1.3.2" class="anchored" data-anchor-id="initial-observations"><span class="header-section-number">1.3.2</span> Initial Observations</h3>
 <p>Initially, it should be noted that there are a lot of negative time-to-event values between the Response_Date and both of the timestamps for when the phone is picked up. This could imply that the Response_Date column is also being impacted, at times, when the call is reopened. If this is the case, then I would recommend using that column for fencing entries and, even then, with caution. You can also see a lot of negative values between the ClockStartTime and the phone pickups. Again, this implies, to me, that this column may not be the most accurate. From appearances, I would recommend future analyses start with the Fixed_Time_PhonePickup as the initial point and disregard the call start time.</p>
-<p>I am pleased to see that there are no negative time-to-event values between the Time_PhonePickUp and Fixed_Time_PhonePickUp columns. That implies that there are no issues with reopening calls there. I would recommend using the <em>Fixed</em> value whenever possible. Those are implied to be immutable per CentralSquare. I am also pleased to see that see there are no negative time-to-event values for the span between the phone pickup and the first calltaking keystroke. This gives us the first two steps in an overarching analysis of the call process. The only drawback I saw is in the number of rows missing for both the Time_PhonePickUp and Fixed_Time_PhonePickUp columns. There are 6450 and 6516 missing rows respectively. These represent 3.61 percent and 3.64 percent of the columns missing respectively. The good news is that, at under 5% of the dataset, initial EDA and other preliminary work can safely discard those columns.</p>
+<p>I am pleased to see that there are no negative time-to-event values between the Time_PhonePickUp and Fixed_Time_PhonePickUp columns. That implies that there are no issues with reopening calls there. I would recommend using the <em>Fixed</em> value whenever possible. Those are implied to be immutable per CentralSquare. I am also pleased to see that see there are no negative time-to-event values for the span between the phone pickup and the first calltaking keystroke. The only drawback I saw is in the number of rows missing for both the Time_PhonePickUp and Fixed_Time_PhonePickUp columns. There are 6450 and 6516 missing rows respectively. These represent 3.61 percent and 3.64 percent of the columns missing respectively. The good news is that, at under 5% of the dataset, initial EDA and other preliminary work can safely discard those columns.</p>
 <p>We should abandon the TimeCallViewed column. There are too many missing values. Attempting to use this column in time-to-event analyses resulted in over 40% of those events having missing data. While abandoned calls may be considered censored in survival analyses, applying censoring rules to these columns renders that column inert analytically. Therefore abandoning the column is the only analytical course of action.</p>
 <p>Another positive observation was a lack of negative values between the time stamps for calls entering the dispatch queue. Additionally, there were no missing values between the two columns either. So we appear to be able to use either column, again I recommend defaulting to the <em>Fixed</em> alternative for analytical purposes.</p>
+<p>The reversals show that where there were no negative time-to-event values between the phone pickup timestamps, the first entering queue timestamps, the completion of the call taking process timestamps. This is heartening and allows us to select either of the two timestamps for the same event. The interesting thing to note is that there is a delta in about 50% of cases between the phone pickup and the first call taking keystroke. This confirms the idea that we can build a call flow process for survival analyses that starts with the phone pickup and continues with the first keystroke. It also shows that nearly half of the time, the timestamps for phone pickup and first keystroke are identical.</p>
+</section>
+<section id="eda" class="level3" data-number="1.3.3">
+<h3 data-number="1.3.3" class="anchored" data-anchor-id="eda"><span class="header-section-number">1.3.3</span> EDA</h3>
+<p>Now that we know what we’re facing with respect to negative values and missing values, the first stage of analysis can take place. This first summary will leave the negative values in place, but will remove the missing values from the calculation.</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped table-hover caption-top table-sm small" data-quarto-postprocess="true">
+<caption>Weekly Elapsed Time Summary Table</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Minimum</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Mean</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Median</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Q1.25%</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Q3.75%</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Maximum</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Std_Dev</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Skewness</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Kurtosis</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">DELTA_RD_CST</td>
+<td style="text-align: right;">-571677</td>
+<td style="text-align: right;">351.89</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">10663719</td>
+<td style="text-align: right;">35765.40</td>
+<td style="text-align: right;">200.32</td>
+<td style="text-align: right;">51040.83</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DELTA_RD_TPU</td>
+<td style="text-align: right;">-16</td>
+<td style="text-align: right;">-0.80</td>
+<td style="text-align: right;">-1</td>
+<td style="text-align: right;">-2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.90</td>
+<td style="text-align: right;">-0.65</td>
+<td style="text-align: right;">0.25</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DELTA_RD_FTPU</td>
+<td style="text-align: right;">-16</td>
+<td style="text-align: right;">-0.80</td>
+<td style="text-align: right;">-1</td>
+<td style="text-align: right;">-2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.90</td>
+<td style="text-align: right;">-0.65</td>
+<td style="text-align: right;">0.25</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DELTA_RD_FCTK</td>
+<td style="text-align: right;">-10</td>
+<td style="text-align: right;">3.40</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5051</td>
+<td style="text-align: right;">27.60</td>
+<td style="text-align: right;">76.82</td>
+<td style="text-align: right;">10171.81</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DELTA_CST_TPU</td>
+<td style="text-align: right;">-10663719</td>
+<td style="text-align: right;">-283.97</td>
+<td style="text-align: right;">-1</td>
+<td style="text-align: right;">-2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">571677</td>
+<td style="text-align: right;">33772.02</td>
+<td style="text-align: right;">-225.36</td>
+<td style="text-align: right;">62965.71</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DELTA_CST_FTPU</td>
+<td style="text-align: right;">-10663719</td>
+<td style="text-align: right;">-284.07</td>
+<td style="text-align: right;">-1</td>
+<td style="text-align: right;">-2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">571677</td>
+<td style="text-align: right;">33778.63</td>
+<td style="text-align: right;">-225.32</td>
+<td style="text-align: right;">62941.06</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DELTA_CST_FCTK</td>
+<td style="text-align: right;">-10663719</td>
+<td style="text-align: right;">-279.68</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">571677</td>
+<td style="text-align: right;">33772.07</td>
+<td style="text-align: right;">-225.36</td>
+<td style="text-align: right;">62965.47</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DELTA_TPU_FTPU</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">NaN</td>
+<td style="text-align: right;">NaN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DELTA_TPU_FCTK</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">4.21</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">5053</td>
+<td style="text-align: right;">27.65</td>
+<td style="text-align: right;">76.42</td>
+<td style="text-align: right;">10101.34</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DELTA_FTPU_FCTK</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">4.21</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">5053</td>
+<td style="text-align: right;">27.65</td>
+<td style="text-align: right;">76.40</td>
+<td style="text-align: right;">10097.63</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DELTA_QUEUES</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">NaN</td>
+<td style="text-align: right;">NaN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DELTA_CALLTAKING</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">NaN</td>
+<td style="text-align: right;">NaN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">STEP_1</td>
+<td style="text-align: right;">-10663719</td>
+<td style="text-align: right;">-283.97</td>
+<td style="text-align: right;">-1</td>
+<td style="text-align: right;">-2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">571677</td>
+<td style="text-align: right;">33772.02</td>
+<td style="text-align: right;">-225.36</td>
+<td style="text-align: right;">62965.71</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">STEP_2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">4.21</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">5053</td>
+<td style="text-align: right;">27.65</td>
+<td style="text-align: right;">76.42</td>
+<td style="text-align: right;">10101.34</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CALL_TIME</td>
+<td style="text-align: right;">-2</td>
+<td style="text-align: right;">198.97</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">207</td>
+<td style="text-align: right;">90227</td>
+<td style="text-align: right;">548.13</td>
+<td style="text-align: right;">35.87</td>
+<td style="text-align: right;">4423.98</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">STEP_3</td>
+<td style="text-align: right;">-2</td>
+<td style="text-align: right;">4293.26</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">93</td>
+<td style="text-align: right;">15730112</td>
+<td style="text-align: right;">113571.13</td>
+<td style="text-align: right;">66.89</td>
+<td style="text-align: right;">6270.95</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">STEP_4</td>
+<td style="text-align: right;">-14854005</td>
+<td style="text-align: right;">-4836.92</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">265</td>
+<td style="text-align: right;">71938</td>
+<td style="text-align: right;">123966.19</td>
+<td style="text-align: right;">-54.16</td>
+<td style="text-align: right;">4107.15</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">STEP_5</td>
+<td style="text-align: right;">-1695</td>
+<td style="text-align: right;">1035.30</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;">3627979</td>
+<td style="text-align: right;">33709.73</td>
+<td style="text-align: right;">61.41</td>
+<td style="text-align: right;">4687.81</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">STEP_6</td>
+<td style="text-align: right;">-3627979</td>
+<td style="text-align: right;">-75.50</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">10715</td>
+<td style="text-align: right;">11196.51</td>
+<td style="text-align: right;">-316.02</td>
+<td style="text-align: right;">102138.21</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">STEP_7</td>
+<td style="text-align: right;">-3355</td>
+<td style="text-align: right;">785.79</td>
+<td style="text-align: right;">211</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">411</td>
+<td style="text-align: right;">14853997</td>
+<td style="text-align: right;">49026.79</td>
+<td style="text-align: right;">270.03</td>
+<td style="text-align: right;">80255.55</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">STEP_8</td>
+<td style="text-align: right;">-14847718</td>
+<td style="text-align: right;">2396.61</td>
+<td style="text-align: right;">795</td>
+<td style="text-align: right;">303</td>
+<td style="text-align: right;">2292</td>
+<td style="text-align: right;">8711058</td>
+<td style="text-align: right;">60703.95</td>
+<td style="text-align: right;">-115.97</td>
+<td style="text-align: right;">39169.52</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">STEP_9</td>
+<td style="text-align: right;">-284</td>
+<td style="text-align: right;">6930.77</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1315</td>
+<td style="text-align: right;">14883795</td>
+<td style="text-align: right;">119785.64</td>
+<td style="text-align: right;">56.36</td>
+<td style="text-align: right;">4486.34</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">STEP_10</td>
+<td style="text-align: right;">-2152</td>
+<td style="text-align: right;">9048.81</td>
+<td style="text-align: right;">1680</td>
+<td style="text-align: right;">580</td>
+<td style="text-align: right;">4887</td>
+<td style="text-align: right;">10249784</td>
+<td style="text-align: right;">110800.21</td>
+<td style="text-align: right;">52.69</td>
+<td style="text-align: right;">3548.09</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">TOTAL_TIME_A</td>
+<td style="text-align: right;">-2300</td>
+<td style="text-align: right;">16750.64</td>
+<td style="text-align: right;">1254</td>
+<td style="text-align: right;">195</td>
+<td style="text-align: right;">4510</td>
+<td style="text-align: right;">18518472</td>
+<td style="text-align: right;">239705.75</td>
+<td style="text-align: right;">33.53</td>
+<td style="text-align: right;">1470.26</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TOTAL_TIME_B</td>
+<td style="text-align: right;">-10663451</td>
+<td style="text-align: right;">17046.01</td>
+<td style="text-align: right;">1280</td>
+<td style="text-align: right;">170</td>
+<td style="text-align: right;">4543</td>
+<td style="text-align: right;">18518472</td>
+<td style="text-align: right;">248013.95</td>
+<td style="text-align: right;">31.13</td>
+<td style="text-align: right;">1366.78</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<section id="eda-observations" class="level4" data-number="1.3.3.1">
+<h4 data-number="1.3.3.1" class="anchored" data-anchor-id="eda-observations"><span class="header-section-number">1.3.3.1</span> EDA Observations</h4>
+<p>The first thing that should stand out is that there are several mean values that have a negative value. In a time-to-event analysis, this disqualifies this dataset. If you notice, the minimum for some values represents the largest difference between the columns. For example, the maximum negative value between the clock start time and the time the phone was picked up is a little over 123 days. This implies that we answered the phone for that call about 4 months before the clock even started on the event. On the other hand, the maximum positive value for that same field implies that we answered a call about 6.6 days after the clock started. Both of these instances are caused by the call being reopened after close. In these cases, the mean value is also negative showing that we, <em>on average</em>, answered the phone about 4 minutes and 45 seconds before the clock started. In fact, even the median value shows that we answered the call a second before the clock started. As discussed above, this suggests that we do not use the ClockStartTime column in the database for future work. Unlike the Response_Date column which can be used as a fencing field. These values are also spread out over 13 months and nearly 170,000 rows of data since the calculations ignored the missing data fields. We can create new datasets that allow for the removal of the negative values and allow for only positive analysis. We can also address outlier values by determing how to identify them in the dataset and those analyses will proceed below.</p>
+</section>
+</section>
+<section id="first-visuals" class="level3" data-number="1.3.4">
+<h3 data-number="1.3.4" class="anchored" data-anchor-id="first-visuals"><span class="header-section-number">1.3.4</span> First Visuals</h3>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="test2_files/figure-html/first_numeric_run-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[2]]</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="test2_files/figure-html/first_numeric_run-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[3]]</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="test2_files/figure-html/first_numeric_run-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[[4]]</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="test2_files/figure-html/first_numeric_run-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>These graphs show the limitations of visualizing these columns. As you can see, the</p>
 </section>
 </section>
 </section>

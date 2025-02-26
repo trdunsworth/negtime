@@ -2,7 +2,7 @@
 title: "CAD Time Stamp Analysis"
 date: "2025-02-05"
 format:
-  html:
+  docx:
     toc: true
     toc-title: "Contents"
     number-sections: true
