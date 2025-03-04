@@ -481,19 +481,29 @@ detect_outliers <- function(data, var) {
   # Identify rows that are outliers in both methods
   common_outliers <- clean_data %>% filter(IQR_outlier & Modified_Z_outlier)
 
-  # Create the data frame
+  # Create the data frame with the specified name
   outlier_df_name <- paste0(var, "_outliers")
   assign(outlier_df_name, common_outliers, envir = .GlobalEnv)
 
-  return(list(outliers = clean_data, common_outliers = common_outliers))
+  return(list(
+    outliers = clean_data, 
+    common_outliers = common_outliers,
+    outlier_df_name = outlier_df_name
+  ))
 }
 ```
 
 We can test this with any of the numeric variables. Experiment 1 is
-```{r}
+```{r outlier1}
 #| echo: false
+#| output: false
 
 detect_outliers(df, "CALL_TIME")
 
 ```
 
+```{r outlier1_head}
+#| echo: false
+
+print(head(CALL_TIME_outliers))
+```

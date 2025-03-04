@@ -1254,49 +1254,22 @@ Note
 <p>We can test this with any of the numeric variables. Experiment 1 is</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>$outliers
-# A tibble: 172,330 × 52
-        ID Reception Problem    Priority Agency Jurisdiction Response_Date      
-     &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;        &lt;dttm&gt;             
- 1 2659640 E-911     911 TRANS…        7 LAW    Alexandria … 2024-01-01 00:01:09
- 2 2659641 E-911     BLS EMERG…        3 FIRE   200 ALX      2024-01-01 00:02:05
- 3 2659642 E-911     UNKNOWN          99 DEC    DEC          2024-01-01 00:02:54
- 4 2659643 E-911     UNKNOWN          99 DEC    DEC          2024-01-01 00:03:36
- 5 2659644 E-911     DWI - DRU…        2 LAW    Alexandria … 2024-01-01 00:03:54
- 6 2659645 E-911     UNKNOWN          99 DEC    DEC          2024-01-01 00:04:02
- 7 2659646 E-911     MVC AUTO          2 FIRE   200 ALX      2024-01-01 00:04:15
- 8 2659647 Phone     WEAPON VI…        1 LAW    Alexandria … 2024-01-01 00:04:41
- 9 2659648 E-911     UNKNOWN          99 DEC    DEC          2024-01-01 00:04:54
-10 2659650 E-911     UNKNOWN          99 DEC    DEC          2024-01-01 00:05:31
-# ℹ 172,320 more rows
+<pre><code># A tibble: 6 × 52
+       ID Reception Problem     Priority Agency Jurisdiction Response_Date      
+    &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;        &lt;dttm&gt;             
+1 2659717 E-911     DOMESTIC V…        1 LAW    Alexandria … 2024-01-01 02:11:07
+2 2659739 E-911     ASSAULT NO…        2 LAW    Alexandria … 2024-01-01 02:49:59
+3 2659785 E-911     SEIZURE AL…        1 FIRE   200 ALX      2024-01-01 05:10:23
+4 2659799 E-911     ASSAULT NO…        3 LAW    Alexandria … 2024-01-01 06:39:14
+5 2659800 E-911     DISORDERLY…        2 LAW    Alexandria … 2024-01-01 06:52:47
+6 2659812 E-911     911 HANG UP        2 LAW    Alexandria … 2024-01-01 07:42:49
 # ℹ 45 more variables: Clock_Start &lt;dttm&gt;, Phone_Start &lt;dttm&gt;,
 #   Fixed_Phone_Start &lt;dttm&gt;, First_Keystroke &lt;dttm&gt;, DELTA_RD_CST &lt;dbl&gt;,
 #   DELTA_RD_TPU &lt;dbl&gt;, DELTA_RD_FTPU &lt;dbl&gt;, DELTA_RD_FCTK &lt;dbl&gt;,
 #   DELTA_CST_TPU &lt;dbl&gt;, DELTA_CST_FTPU &lt;dbl&gt;, DELTA_CST_FCTK &lt;dbl&gt;,
 #   DELTA_TPU_FTPU &lt;dbl&gt;, DELTA_TPU_FCTK &lt;dbl&gt;, DELTA_FTPU_FCTK &lt;dbl&gt;,
-#   Viewed &lt;dttm&gt;, Queued &lt;dttm&gt;, Fixed_Queued &lt;dttm&gt;, DELTA_QUEUES &lt;dbl&gt;, …
-
-$common_outliers
-# A tibble: 13,002 × 52
-        ID Reception Problem    Priority Agency Jurisdiction Response_Date      
-     &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;        &lt;dttm&gt;             
- 1 2659717 E-911     DOMESTIC …        1 LAW    Alexandria … 2024-01-01 02:11:07
- 2 2659739 E-911     ASSAULT N…        2 LAW    Alexandria … 2024-01-01 02:49:59
- 3 2659785 E-911     SEIZURE A…        1 FIRE   200 ALX      2024-01-01 05:10:23
- 4 2659799 E-911     ASSAULT N…        3 LAW    Alexandria … 2024-01-01 06:39:14
- 5 2659800 E-911     DISORDERL…        2 LAW    Alexandria … 2024-01-01 06:52:47
- 6 2659812 E-911     911 HANG …        2 LAW    Alexandria … 2024-01-01 07:42:49
- 7 2659818 Phone     SUSPICIOU…        2 LAW    Alexandria … 2024-01-01 08:14:22
- 8 2659825 Phone     SUSPICIOU…        2 LAW    Alexandria … 2024-01-01 09:21:23
- 9 2659833 Phone     PARKING C…        4 LAW    Alexandria … 2024-01-01 09:45:31
-10 2659838 E-911     DOMESTIC …        2 LAW    Alexandria … 2024-01-01 10:00:41
-# ℹ 12,992 more rows
-# ℹ 45 more variables: Clock_Start &lt;dttm&gt;, Phone_Start &lt;dttm&gt;,
-#   Fixed_Phone_Start &lt;dttm&gt;, First_Keystroke &lt;dttm&gt;, DELTA_RD_CST &lt;dbl&gt;,
-#   DELTA_RD_TPU &lt;dbl&gt;, DELTA_RD_FTPU &lt;dbl&gt;, DELTA_RD_FCTK &lt;dbl&gt;,
-#   DELTA_CST_TPU &lt;dbl&gt;, DELTA_CST_FTPU &lt;dbl&gt;, DELTA_CST_FCTK &lt;dbl&gt;,
-#   DELTA_TPU_FTPU &lt;dbl&gt;, DELTA_TPU_FCTK &lt;dbl&gt;, DELTA_FTPU_FCTK &lt;dbl&gt;,
-#   Viewed &lt;dttm&gt;, Queued &lt;dttm&gt;, Fixed_Queued &lt;dttm&gt;, DELTA_QUEUES &lt;dbl&gt;, …</code></pre>
+#   Viewed &lt;dttm&gt;, Queued &lt;dttm&gt;, Fixed_Queued &lt;dttm&gt;, DELTA_QUEUES &lt;dbl&gt;,
+#   Phone_End &lt;dttm&gt;, Fixed_Phone_End &lt;dttm&gt;, DELTA_CALLTAKING &lt;dbl&gt;, …</code></pre>
 </div>
 </div>
 </section>
